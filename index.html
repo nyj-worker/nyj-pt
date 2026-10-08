@@ -65,6 +65,11 @@
         padding: 0.875rem !important;
       }
     }
+    /* Smooth scrolling with sticky header offset */
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 4.5rem;
+    }
     /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
@@ -82,50 +87,154 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased pb-16 sm:pb-0">
+<body class="min-h-screen flex flex-col antialiased pb-20 sm:pb-0">
 
   <!-- Top Global Header -->
   <header class="gradient-hero text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 sm:py-4 border-b border-white/10 gap-2.5 sm:gap-3">
-        <div class="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
-          <div class="bg-blue-500/20 border border-blue-400/30 p-2 sm:p-2.5 rounded-xl flex items-center justify-center shrink-0">
-            <i class="fa-solid fa-bus-simple text-xl sm:text-2xl text-blue-300"></i>
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 whitespace-nowrap">
-                시민주권시대 남양주 대전환
-              </span>
-              <span class="text-[10px] sm:text-xs text-slate-300 whitespace-nowrap">2026. 1회 추경 기준</span>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2.5 sm:py-4 border-b border-white/10 gap-2 sm:gap-3">
+        
+        <!-- Mobile Top Row: Logo & Hamburger button -->
+        <div class="flex items-center justify-between w-full sm:w-auto">
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div class="bg-blue-500/20 border border-blue-400/30 p-2 sm:p-2.5 rounded-xl flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-bus-simple text-xl sm:text-2xl text-blue-300"></i>
             </div>
-            <h1 class="text-base sm:text-xl md:text-2xl font-bold tracking-tight text-white mt-0.5 sm:mt-1 break-keep leading-snug">
-              남양주시 대중교통 예산 주민수혜도 분석
-            </h1>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 whitespace-nowrap">
+                  시민주권시대 남양주 대전환
+                </span>
+                <span class="text-[10px] sm:text-xs text-slate-300 whitespace-nowrap">2026. 1추 기준</span>
+              </div>
+              <h1 class="text-base sm:text-xl md:text-2xl font-bold tracking-tight text-white mt-0.5 sm:mt-1 break-keep leading-snug">
+                남양주시 대중교통 예산 주민수혜도 분석
+              </h1>
+            </div>
           </div>
+
+          <!-- Mobile Hamburger Toggle Button -->
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu(true)" class="sm:hidden p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition touch-target flex items-center justify-center shrink-0 ml-2" aria-label="메뉴 열기">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
         </div>
 
-        <!-- Meta info & Actions -->
-        <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 no-print pt-2 sm:pt-0 border-t border-white/10 sm:border-0">
-          <div class="text-xs text-slate-300 flex items-center gap-2">
-            <span class="inline-block sm:hidden text-[11px]"><i class="fa-solid fa-building-columns mr-1"></i>대중교통과</span>
-            <div class="text-right text-xs text-slate-300 hidden md:block">
-              <p><i class="fa-regular fa-calendar-check mr-1"></i> 분석일자: 2026. 10. 6.(화)</p>
-              <p><i class="fa-solid fa-building-columns mr-1"></i> 대중교통과</p>
-            </div>
+        <!-- Desktop Meta info & Actions -->
+        <div class="hidden sm:flex items-center justify-end gap-2.5 no-print">
+          <div class="text-right text-xs text-slate-300 mr-1">
+            <p><i class="fa-regular fa-calendar-check mr-1"></i> 분석일자: 2026. 10. 6.(화)</p>
+            <p><i class="fa-solid fa-building-columns mr-1"></i> 대중교통과</p>
           </div>
-          <div class="flex items-center gap-1.5 sm:gap-2">
-            <button onclick="window.print()" class="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium border border-white/20 transition flex items-center gap-1.5 shadow-sm touch-target">
-              <i class="fa-solid fa-print"></i> <span class="hidden xs:inline">보고서 </span>인쇄
-            </button>
-            <button onclick="scrollToSection('calculator')" class="px-3 sm:px-3.5 py-1.5 sm:py-2 bg-sky-500 hover:bg-sky-400 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm touch-target">
-              <i class="fa-solid fa-calculator"></i> 내 수혜액 계산
-            </button>
-          </div>
+          <button onclick="window.print()" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium border border-white/20 transition flex items-center gap-1.5 shadow-sm touch-target">
+            <i class="fa-solid fa-print"></i> 보고서 인쇄
+          </button>
+          <button onclick="scrollToSection('calculator')" class="px-3.5 py-2 bg-sky-500 hover:bg-sky-400 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm touch-target">
+            <i class="fa-solid fa-calculator"></i> 내 수혜액 계산
+          </button>
         </div>
+
       </div>
     </div>
   </header>
+
+  <!-- Mobile Slide-out Drawer Backdrop & Menu -->
+  <div id="mobile-drawer-backdrop" onclick="toggleMobileMenu(false)" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 hidden transition-opacity duration-300 opacity-0 no-print" aria-hidden="true"></div>
+  
+  <aside id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] bg-white text-slate-800 z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out no-print">
+    <!-- Drawer Header -->
+    <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-bus text-blue-400"></i>
+        <span class="font-bold text-sm">섹션 바로가기</span>
+      </div>
+      <button onclick="toggleMobileMenu(false)" class="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition" aria-label="메뉴 닫기">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Navigation Links -->
+    <nav class="flex-1 overflow-y-auto p-3 space-y-1.5 text-xs font-medium">
+      <div class="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">주요 보고서 항목</div>
+      
+      <button onclick="handleDrawerNav('section-kpi')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition text-left">
+        <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-chart-pie"></i>
+        </span>
+        <div>
+          <div class="font-bold">1. 핵심 지표 요약</div>
+          <div class="text-[10px] text-slate-400">총예산 921.1억 및 1인당 수혜액</div>
+        </div>
+      </button>
+
+      <button onclick="handleDrawerNav('section-sectors')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition text-left">
+        <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-layer-group"></i>
+        </span>
+        <div>
+          <div class="font-bold">2. 지원분야별 예산</div>
+          <div class="text-[10px] text-slate-400">버스·교통비·정류장·택시 현황</div>
+        </div>
+      </button>
+
+      <button onclick="handleDrawerNav('section-breakdown')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition text-left">
+        <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-chart-simple"></i>
+        </span>
+        <div>
+          <div class="font-bold">3. 목적 및 재원 구조</div>
+          <div class="text-[10px] text-slate-400">운영지원 비중 및 국·도·시비 분석</div>
+        </div>
+      </button>
+
+      <button onclick="handleDrawerNav('calculator')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition text-left">
+        <span class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-calculator"></i>
+        </span>
+        <div>
+          <div class="font-bold text-sky-800">4. 내 수혜액 시뮬레이터</div>
+          <div class="text-[10px] text-sky-600">통근자·청년·어르신·택시기사 맞춤</div>
+        </div>
+      </button>
+
+      <button onclick="handleDrawerNav('section-details')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition text-left">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-table-list"></i>
+        </span>
+        <div>
+          <div class="font-bold">5. 세부 사업 내역서</div>
+          <div class="text-[10px] text-slate-400">적자보전·운수지원 전체 표</div>
+        </div>
+      </button>
+
+      <button onclick="handleDrawerNav('section-insights')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition text-left">
+        <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-clipboard-check"></i>
+        </span>
+        <div>
+          <div class="font-bold">6. 분석 결과 및 정책 제언</div>
+          <div class="text-[10px] text-slate-400">공급기반 및 시 재정부담 완화책</div>
+        </div>
+      </button>
+
+      <!-- Quick Actions inside Drawer -->
+      <div class="pt-3 mt-3 border-t border-slate-100 space-y-2">
+        <div class="px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">단위 변경 및 편의도구</div>
+        <div class="grid grid-cols-3 gap-1 px-1">
+          <button onclick="setCurrencyUnit('krw')" class="py-1.5 rounded-lg border border-slate-200 text-slate-700 text-center font-medium hover:bg-slate-50">원 (￦)</button>
+          <button onclick="setCurrencyUnit('thous')" class="py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-center font-bold">천원</button>
+          <button onclick="setCurrencyUnit('eok')" class="py-1.5 rounded-lg border border-slate-200 text-slate-700 text-center font-medium hover:bg-slate-50">억원</button>
+        </div>
+        <button onclick="window.print(); toggleMobileMenu(false);" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium flex items-center justify-center gap-2 mt-2">
+          <i class="fa-solid fa-print"></i> 보고서 인쇄
+        </button>
+      </div>
+    </nav>
+
+    <!-- Drawer Footer -->
+    <div class="p-3 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 text-center">
+      남양주시청 대중교통과 (2026. 10. 6.)
+    </div>
+  </aside>
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
@@ -164,7 +273,7 @@
     </div>
 
     <!-- KPI Section: 4 Key High-Level Figures -->
-    <section>
+    <section id="section-kpi">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-1">
         <h3 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
           <i class="fa-solid fa-chart-pie text-blue-600"></i>
@@ -274,7 +383,7 @@
     </div>
 
     <!-- Section 2: 지원분야별 예산 현황 -->
-    <section>
+    <section id="section-sectors">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3.5 border-b border-slate-200 gap-1.5">
         <div>
           <h3 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -470,7 +579,7 @@
     </section>
 
     <!-- Section 3: 사업 목적별 & 재원별(국·도·시비) 입체 분석 -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+    <section id="section-breakdown" class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
 
       <!-- Left Column: 목적별 구분 (약 921.1억 원) -->
       <div class="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -700,7 +809,7 @@
     </section>
 
     <!-- Section 5: 공식 종합 예산표 및 단위별 상세 내역 (Mobile Dual View) -->
-    <section class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+    <section id="section-details" class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-200 gap-3">
         <div>
           <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -981,7 +1090,7 @@
     </section>
 
     <!-- Section 6: 문서 3대 분석 결과 및 정책 제언 -->
-    <section>
+    <section id="section-insights">
       <div class="mb-3.5">
         <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
           <i class="fa-solid fa-clipboard-check text-blue-600"></i>
@@ -1046,21 +1155,40 @@
 
   </main>
 
-  <!-- Mobile Floating Quick Bar (Visible only on mobile) -->
-  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-around shadow-lg no-print">
-    <button onclick="cycleCurrencyUnit()" class="flex flex-col items-center text-slate-600 hover:text-blue-600 text-[11px] font-medium py-1">
-      <i class="fa-solid fa-coins text-sm text-blue-600 mb-0.5"></i>
-      <span>단위: <strong id="mobile-unit-indicator" class="text-blue-600">천원</strong></span>
-    </button>
-    <button onclick="scrollToSection('calculator')" class="flex flex-col items-center text-slate-600 hover:text-sky-600 text-[11px] font-medium py-1">
-      <i class="fa-solid fa-calculator text-sm text-sky-600 mb-0.5"></i>
-      <span>수혜액 계산</span>
-    </button>
-    <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="flex flex-col items-center text-slate-600 hover:text-slate-900 text-[11px] font-medium py-1">
-      <i class="fa-solid fa-arrow-up text-sm text-slate-500 mb-0.5"></i>
-      <span>맨 위로</span>
-    </button>
-  </div>
+  <!-- Mobile Bottom Navigation Bar (Section Quick Links & Active Scrollspy) -->
+  <nav id="mobile-bottom-nav" class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1.5 shadow-lg no-print">
+    <div class="grid grid-cols-5 gap-0.5 text-center">
+      <!-- 1. 핵심지표 -->
+      <button onclick="scrollToSection('section-kpi')" data-target="section-kpi" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
+        <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
+        <span class="text-[10px] font-medium leading-none">핵심요약</span>
+      </button>
+
+      <!-- 2. 분야별 -->
+      <button onclick="scrollToSection('section-sectors')" data-target="section-sectors" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
+        <i class="fa-solid fa-layer-group text-base mb-0.5"></i>
+        <span class="text-[10px] font-medium leading-none">분야별</span>
+      </button>
+
+      <!-- 3. 재원구조 -->
+      <button onclick="scrollToSection('section-breakdown')" data-target="section-breakdown" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
+        <i class="fa-solid fa-chart-simple text-base mb-0.5"></i>
+        <span class="text-[10px] font-medium leading-none">재원구조</span>
+      </button>
+
+      <!-- 4. 수혜계산 -->
+      <button onclick="scrollToSection('calculator')" data-target="calculator" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-sky-600 transition rounded-lg">
+        <i class="fa-solid fa-calculator text-base mb-0.5"></i>
+        <span class="text-[10px] font-medium leading-none">수혜계산</span>
+      </button>
+
+      <!-- 5. 세부내역 -->
+      <button onclick="scrollToSection('section-details')" data-target="section-details" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
+        <i class="fa-solid fa-table-list text-base mb-0.5"></i>
+        <span class="text-[10px] font-medium leading-none">세부내역</span>
+      </button>
+    </div>
+  </nav>
 
   <!-- Footer Component -->
   <footer class="bg-slate-900 text-slate-400 py-6 sm:py-8 border-t border-slate-800 mt-8 sm:mt-12 no-print">
@@ -1088,6 +1216,48 @@
     // State management for currency unit
     let currentUnit = 'thous'; // 'krw', 'thous', 'eok'
     const unitCycle = ['thous', 'eok', 'krw'];
+
+    // Mobile Drawer Open / Close Toggle Function
+    function toggleMobileMenu(isOpen) {
+      const drawer = document.getElementById('mobile-drawer');
+      const backdrop = document.getElementById('mobile-drawer-backdrop');
+      if (!drawer || !backdrop) return;
+
+      if (isOpen) {
+        backdrop.classList.remove('hidden');
+        // Trigger opacity fade-in
+        requestAnimationFrame(() => {
+          backdrop.classList.remove('opacity-0');
+          backdrop.classList.add('opacity-100');
+          drawer.classList.remove('translate-x-full');
+        });
+        document.body.style.overflow = 'hidden';
+      } else {
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0');
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => {
+          backdrop.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 300);
+      }
+    }
+
+    // Drawer item click handler (closes drawer then smoothly scrolls)
+    function handleDrawerNav(targetId) {
+      toggleMobileMenu(false);
+      setTimeout(() => {
+        scrollToSection(targetId);
+      }, 250);
+    }
+
+    // Scroll to section with custom offset consideration
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
 
     // Format numbers helper
     function formatNumber(num) {
@@ -1328,6 +1498,42 @@
 
       // Initial formatting pass
       updateAllCurrencyDisplays();
+
+      // Mobile bottom bar active highlight via IntersectionObserver
+      const sectionIds = ['section-kpi', 'section-sectors', 'section-breakdown', 'calculator', 'section-details'];
+      const navItems = document.querySelectorAll('.mobile-nav-item');
+
+      const observerOptions = {
+        root: null,
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const currentId = entry.target.id;
+            navItems.forEach(item => {
+              if (item.getAttribute('data-target') === currentId) {
+                item.classList.add('text-blue-600', 'font-bold');
+                item.classList.remove('text-slate-500');
+                const icon = item.querySelector('i');
+                if (icon) icon.classList.add('scale-110');
+              } else {
+                item.classList.remove('text-blue-600', 'font-bold');
+                item.classList.add('text-slate-500');
+                const icon = item.querySelector('i');
+                if (icon) icon.classList.remove('scale-110');
+              }
+            });
+          }
+        });
+      }, observerOptions);
+
+      sectionIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
     });
   </script>
 </body>
