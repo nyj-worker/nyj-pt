@@ -582,7 +582,7 @@
     <section id="section-breakdown" class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
 
       <!-- Left Column: 목적별 구분 (약 921.1억 원) -->
-      <div class="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+      <div id="section-purpose" class="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-3">
             <div>
@@ -673,7 +673,7 @@
       </div>
 
       <!-- Right Column: 재원별 구분 (도넛 차트) -->
-      <div class="lg:col-span-5 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+      <div id="section-fund" class="lg:col-span-5 bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-1.5">
             <div>
@@ -1156,36 +1156,42 @@
   </main>
 
   <!-- Mobile Bottom Navigation Bar (Section Quick Links & Active Scrollspy) -->
-  <nav id="mobile-bottom-nav" class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1.5 shadow-lg no-print">
-    <div class="grid grid-cols-5 gap-0.5 text-center">
+  <nav id="mobile-bottom-nav" class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-0.5 py-1.5 shadow-lg no-print">
+    <div class="grid grid-cols-6 gap-0.5 text-center">
       <!-- 1. 핵심지표 -->
       <button onclick="scrollToSection('section-kpi')" data-target="section-kpi" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
-        <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
-        <span class="text-[10px] font-medium leading-none">핵심요약</span>
+        <i class="fa-solid fa-chart-pie text-sm mb-0.5"></i>
+        <span class="text-[9.5px] font-medium leading-none whitespace-nowrap tracking-tighter">핵심요약</span>
       </button>
 
-      <!-- 2. 분야별 -->
+      <!-- 2. 지원분야별 -->
       <button onclick="scrollToSection('section-sectors')" data-target="section-sectors" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
-        <i class="fa-solid fa-layer-group text-base mb-0.5"></i>
-        <span class="text-[10px] font-medium leading-none">분야별</span>
+        <i class="fa-solid fa-layer-group text-sm mb-0.5"></i>
+        <span class="text-[9.5px] font-medium leading-none whitespace-nowrap tracking-tighter">지원분야별</span>
       </button>
 
-      <!-- 3. 재원구조 -->
-      <button onclick="scrollToSection('section-breakdown')" data-target="section-breakdown" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
-        <i class="fa-solid fa-chart-simple text-base mb-0.5"></i>
-        <span class="text-[10px] font-medium leading-none">재원구조</span>
+      <!-- 3. 사업목적별 -->
+      <button onclick="scrollToSection('section-purpose')" data-target="section-purpose" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
+        <i class="fa-solid fa-bullseye text-sm mb-0.5"></i>
+        <span class="text-[9.5px] font-medium leading-none whitespace-nowrap tracking-tighter">사업목적별</span>
       </button>
 
-      <!-- 4. 수혜계산 -->
+      <!-- 4. 재원구조 -->
+      <button onclick="scrollToSection('section-fund')" data-target="section-fund" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
+        <i class="fa-solid fa-chart-simple text-sm mb-0.5"></i>
+        <span class="text-[9.5px] font-medium leading-none whitespace-nowrap tracking-tighter">재원구조</span>
+      </button>
+
+      <!-- 5. 수혜계산 -->
       <button onclick="scrollToSection('calculator')" data-target="calculator" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-sky-600 transition rounded-lg">
-        <i class="fa-solid fa-calculator text-base mb-0.5"></i>
-        <span class="text-[10px] font-medium leading-none">수혜계산</span>
+        <i class="fa-solid fa-calculator text-sm mb-0.5"></i>
+        <span class="text-[9.5px] font-medium leading-none whitespace-nowrap tracking-tighter">수혜계산</span>
       </button>
 
-      <!-- 5. 세부내역 -->
+      <!-- 6. 세부내역 -->
       <button onclick="scrollToSection('section-details')" data-target="section-details" class="mobile-nav-item flex flex-col items-center justify-center py-1 text-slate-500 hover:text-blue-600 transition rounded-lg">
-        <i class="fa-solid fa-table-list text-base mb-0.5"></i>
-        <span class="text-[10px] font-medium leading-none">세부내역</span>
+        <i class="fa-solid fa-table-list text-sm mb-0.5"></i>
+        <span class="text-[9.5px] font-medium leading-none whitespace-nowrap tracking-tighter">세부내역</span>
       </button>
     </div>
   </nav>
@@ -1251,11 +1257,19 @@
       }, 250);
     }
 
-    // Scroll to section with custom offset consideration
+    // Scroll to section with custom offset consideration (상단 고정 헤더 높이 반영)
     function scrollToSection(id) {
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const header = document.querySelector('header');
+        const headerHeight = header ? header.offsetHeight : 64;
+        const elementPosition = el.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 12;
+
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
       }
     }
 
@@ -1449,12 +1463,6 @@
       }
     }
 
-    function scrollToSection(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
 
     // Chart.js initialization for Fund Breakdown (시비, 국비, 도비)
     window.addEventListener('DOMContentLoaded', () => {
@@ -1500,7 +1508,7 @@
       updateAllCurrencyDisplays();
 
       // Mobile bottom bar active highlight via IntersectionObserver
-      const sectionIds = ['section-kpi', 'section-sectors', 'section-breakdown', 'calculator', 'section-details'];
+      const sectionIds = ['section-kpi', 'section-sectors', 'section-purpose', 'section-fund', 'calculator', 'section-details'];
       const navItems = document.querySelectorAll('.mobile-nav-item');
 
       const observerOptions = {
