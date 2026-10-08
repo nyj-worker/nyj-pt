@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026년 대중교통과 예산 총괄 대시보드</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'Inter', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              800: '#1e3a8a',
+              900: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Pretendard', sans-serif; }
+    /* Custom scrollbar for table container */
+    .table-scroll::-webkit-scrollbar {
+      height: 7px;
+      width: 7px;
+    }
+    .table-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .table-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .table-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header / Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <i data-lucide="bus" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">2026 회계연도</span>
+            <span class="text-xs font-medium text-slate-500">남양주시 대중교통과</span>
+          </div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">대중교통과 예산 총괄 분석 시스템</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="exportToCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition shadow-xs">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>CSV 내보내기</span>
+        </button>
+        <button onclick="printReport()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-800 rounded-lg hover:bg-slate-900 transition shadow-xs">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>보고서 인쇄</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    
+    <!-- Top Summary Banner -->
+    <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-blue-300 text-xs font-medium tracking-wide uppercase mb-1">
+            <span class="inline-block w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+            2026 Budget Overview
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">총 예산 규모 921억 1,290만 원</h2>
+          <p class="text-slate-300 text-sm mt-1 max-w-2xl">
+            시민 이동권 보장 및 광역교통·환승복지 강화를 위해 총 53개 사업에 편성된 2026년도 대중교통과 세출예산 총괄 현황입니다.
+          </p>
+        </div>
+        <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md px-5 py-3.5 rounded-xl border border-white/15">
+          <div class="text-right">
+            <span class="text-xs text-blue-200 block">전체 집행 사업</span>
+            <span class="text-2xl font-bold text-white">53 <span class="text-sm font-normal text-slate-300">개 사업</span></span>
+          </div>
+          <div class="h-10 w-[1px] bg-white/20"></div>
+          <div class="text-right">
+            <span class="text-xs text-blue-200 block">연간 총 수혜인원</span>
+            <span class="text-2xl font-bold text-white">351,261 <span class="text-sm font-normal text-slate-300">명</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Total Budget Card -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">총 예산액</span>
+          <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="wallet" class="w-5 h-5"></i></span>
+        </div>
+        <div class="mt-3">
+          <div class="text-2xl font-extrabold text-slate-900" id="cardTotalBudget">92,112,907 <span class="text-sm font-normal text-slate-500">천원</span></div>
+          <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+            <span class="text-emerald-600 font-medium">약 921.1억 원</span> (100%)
+          </p>
+        </div>
+      </div>
+
+      <!-- Municipal Budget Card (시비) -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">시비 (자체재원)</span>
+          <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="building-2" class="w-5 h-5"></i></span>
+        </div>
+        <div class="mt-3">
+          <div class="text-2xl font-extrabold text-slate-900" id="cardCityBudget">73,326,860 <span class="text-sm font-normal text-slate-500">천원</span></div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div class="bg-indigo-600 h-1.5 rounded-full" style="width: 79.6%;"></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-1.5 flex justify-between">
+            <span>재원 비중</span>
+            <span class="font-semibold text-indigo-600">79.6% (약 733.3억)</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- National Grant (국비) -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">국비 (보조금)</span>
+          <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="landmark" class="w-5 h-5"></i></span>
+        </div>
+        <div class="mt-3">
+          <div class="text-2xl font-extrabold text-slate-900" id="cardGovBudget">12,293,043 <span class="text-sm font-normal text-slate-500">천원</span></div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 13.3%;"></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-1.5 flex justify-between">
+            <span>재원 비중</span>
+            <span class="font-semibold text-emerald-600">13.3% (약 122.9억)</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Provincial Grant (도비) -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">도비 (보조금)</span>
+          <span class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="map-pin" class="w-5 h-5"></i></span>
+        </div>
+        <div class="mt-3">
+          <div class="text-2xl font-extrabold text-slate-900" id="cardProvBudget">6,493,004 <span class="text-sm font-normal text-slate-500">천원</span></div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div class="bg-amber-500 h-1.5 rounded-full" style="width: 7.0%;"></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-1.5 flex justify-between">
+            <span>재원 비중</span>
+            <span class="font-semibold text-amber-600">7.0% (약 64.9억)</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section: 3-column interactive visual stats -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Funding Source Breakdown Chart -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="font-bold text-slate-900 text-sm">재원 분담 구조 (국·도·시비)</h3>
+          </div>
+          <span class="text-xs text-slate-400">단위: %</span>
+        </div>
+        <div class="relative flex-1 flex items-center justify-center min-h-[230px]">
+          <canvas id="fundingChart"></canvas>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-100 text-center">
+          <div class="bg-indigo-50/60 p-2 rounded-lg">
+            <div class="text-[11px] text-indigo-700 font-medium">시비</div>
+            <div class="text-xs font-bold text-indigo-900">79.6%</div>
+          </div>
+          <div class="bg-emerald-50/60 p-2 rounded-lg">
+            <div class="text-[11px] text-emerald-700 font-medium">국비</div>
+            <div class="text-xs font-bold text-emerald-900">13.3%</div>
+          </div>
+          <div class="bg-amber-50/60 p-2 rounded-lg">
+            <div class="text-[11px] text-amber-700 font-medium">도비</div>
+            <div class="text-xs font-bold text-amber-900">7.0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sector Budget Distribution -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="font-bold text-slate-900 text-sm">분야별 예산 비중</h3>
+          </div>
+          <span class="text-xs text-slate-400">단위: 억 원</span>
+        </div>
+        <div class="relative flex-1 flex items-center justify-center min-h-[230px]">
+          <canvas id="sectorChart"></canvas>
+        </div>
+        <p class="text-xs text-slate-400 text-center mt-3 pt-2 border-t border-slate-100">
+          버스 지원 및 통합 교통비 지원이 전체의 95% 이상을 차지합니다.
+        </p>
+      </div>
+
+      <!-- Top High Budget Projects -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="font-bold text-slate-900 text-sm">주요 핵심 대형사업 (Top 5)</h3>
+          </div>
+          <span class="text-xs text-slate-400">단위: 억 원</span>
+        </div>
+        <div class="relative flex-1 flex items-center justify-center min-h-[230px]">
+          <canvas id="topProjectsChart"></canvas>
+        </div>
+        <p class="text-xs text-slate-400 text-center mt-3 pt-2 border-t border-slate-100">
+          K-패스, 광역버스 준공영제, 시내버스 공공관리제가 핵심 지출원입니다.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Filter, Search and Controls Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+      <div class="flex flex-col lg:flex-row gap-4 lg:items-center justify-between mb-4 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">예산 사업 세부 검색 및 필터</h3>
+            <p class="text-xs text-slate-500">원하는 조건으로 사업 내역을 검색하고 비교 분석할 수 있습니다.</p>
+          </div>
+        </div>
+        
+        <!-- Live Search Bar -->
+        <div class="relative w-full lg:w-80">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input type="text" id="searchInput" placeholder="사업명 또는 사업내용 검색..." 
+            class="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+            oninput="applyFilters()">
+          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Sector Filter -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">지원 분야</label>
+          <select id="sectorFilter" onchange="applyFilters()" class="w-full py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            <option value="ALL">전체 분야 (전체보기)</option>
+            <option value="버스">버스 (시내·광역·마을·벽지)</option>
+            <option value="택시">택시 (법인·개인·쉼터·콜택시)</option>
+            <option value="교통비">교통비 (K패스·어르신·청소년)</option>
+            <option value="시설">시설 (승강장·차고지·환승소)</option>
+            <option value="행정">행정 (운영경비·홍보지원)</option>
+          </select>
+        </div>
+
+        <!-- Purpose Filter -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">사업 목적별</label>
+          <select id="purposeFilter" onchange="applyFilters()" class="w-full py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            <option value="ALL">전체 목적 (전체보기)</option>
+            <option value="운수업체 지원금">운수업체 지원금</option>
+            <option value="적자결손 보전금">적자결손 보전금</option>
+            <option value="교통카드(지역화폐) 지원">교통카드/지역화폐 지원</option>
+            <option value="주민편의시설">주민편의시설 개선 및 유지</option>
+            <option value="택시기사 지원비">택시기사 지원비</option>
+            <option value="버스기사 지원비">버스기사 지원비</option>
+            <option value="행정비용">행정비용</option>
+          </select>
+        </div>
+
+        <!-- Funding Source Type Filter -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">재원 구분</label>
+          <select id="fundTypeFilter" onchange="applyFilters()" class="w-full py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            <option value="ALL">전체 재원</option>
+            <option value="ONLY_CITY">순수 시비 (100% 시비 부담)</option>
+            <option value="HAS_GOV">국비 지원 사업 포함</option>
+            <option value="HAS_PROV">도비 지원 사업 포함</option>
+            <option value="MATCH">국·도비 매칭 사업</option>
+          </select>
+        </div>
+
+        <!-- Quick Reset & Item Count -->
+        <div class="flex items-end gap-2">
+          <button onclick="resetFilters()" class="w-full py-2 px-3 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition flex items-center justify-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>필터 초기화</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Stats Status Bar -->
+      <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+        <div class="flex items-center gap-2">
+          <span>검색 결과:</span>
+          <span id="filteredCount" class="font-bold text-blue-600 text-sm">53</span>
+          <span>건 / 필터 합산 예산:</span>
+          <span id="filteredTotalBudget" class="font-bold text-slate-900 text-sm">92,112,907 천원</span>
+          <span class="text-slate-400" id="filteredBudgetInEok">(약 921.1억 원)</span>
+        </div>
+        <div class="text-[11px] text-slate-400">
+          * 행을 클릭하면 상세 내역 카드를 열어볼 수 있습니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div class="table-scroll overflow-x-auto w-full">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 select-none">
+              <th scope="col" class="py-3 px-3.5 font-bold cursor-pointer hover:bg-slate-100 text-center w-12" onclick="sortTable('id')">
+                <div class="inline-flex items-center gap-1">연번 <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 opacity-60"></i></div>
+              </th>
+              <th scope="col" class="py-3 px-3 font-bold w-20 text-center">재원형태</th>
+              <th scope="col" class="py-3 px-4 font-bold cursor-pointer hover:bg-slate-100 min-w-[200px]" onclick="sortTable('name')">
+                <div class="inline-flex items-center gap-1">사업명 <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 opacity-60"></i></div>
+              </th>
+              <th scope="col" class="py-3 px-4 font-bold cursor-pointer hover:bg-slate-100 text-right min-w-[120px]" onclick="sortTable('budget')">
+                <div class="inline-flex items-center justify-end gap-1">총예산액 (천원) <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-blue-600"></i></div>
+              </th>
+              <th scope="col" class="py-3 px-3 font-semibold text-right text-slate-500 hidden md:table-cell min-w-[100px]">국비 (천원)</th>
+              <th scope="col" class="py-3 px-3 font-semibold text-right text-slate-500 hidden md:table-cell min-w-[100px]">도비 (천원)</th>
+              <th scope="col" class="py-3 px-3 font-semibold text-right text-slate-500 hidden sm:table-cell min-w-[100px]">시비 (천원)</th>
+              <th scope="col" class="py-3 px-3 font-bold text-center w-16">분야</th>
+              <th scope="col" class="py-3 px-3 font-bold text-center min-w-[130px]">사업목적</th>
+              <th scope="col" class="py-3 px-3 font-semibold text-right hidden lg:table-cell min-w-[100px]" onclick="sortTable('perCapita')">
+                1인당 수혜액(원)
+              </th>
+              <th scope="col" class="py-3 px-4 font-bold text-center w-16">상세</th>
+            </tr>
+          </thead>
+          <tbody id="budgetTableBody" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Dynamically populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Empty State -->
+      <div id="noResultsState" class="hidden py-16 text-center">
+        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400 mb-3">
+          <i data-lucide="folder-search" class="w-6 h-6"></i>
+        </div>
+        <p class="text-sm font-semibold text-slate-700">검색 조건과 일치하는 사업이 없습니다.</p>
+        <p class="text-xs text-slate-400 mt-1">다른 키워드나 필터 조건을 선택해 보세요.</p>
+        <button onclick="resetFilters()" class="mt-4 px-4 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-medium">
+          필터 초기화
+        </button>
+      </div>
+
+      <!-- Pagination / Footer Info -->
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+        <div>
+          총 <span id="tablePageInfo" class="font-semibold text-slate-800">53</span>개 사업 목록 표시 중
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">데이터 기준: 2026 대중교통과 본예산서</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Project Detail Modal -->
+  <div id="projectModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-slate-900 to-blue-900 p-5 text-white flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span id="modalIdBadge" class="text-xs px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30 font-medium">연번 1</span>
+            <span id="modalSectorBadge" class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 font-medium">버스</span>
+            <span id="modalFundBadge" class="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white font-mono">시비 100%</span>
+          </div>
+          <h3 id="modalTitle" class="text-lg sm:text-xl font-bold text-white">사업명</h3>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-6">
+        
+        <!-- Budget Amount Box -->
+        <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-semibold text-blue-700 block">총 편성 예산액</span>
+            <span id="modalTotalBudget" class="text-2xl font-black text-blue-900">0</span>
+            <span class="text-xs text-blue-700 ml-1">천원</span>
+          </div>
+          <div id="modalBudgetEok" class="text-sm font-semibold text-blue-600 bg-white px-3 py-1.5 rounded-lg border border-blue-200 self-start sm:self-auto">
+            약 0 억 원
+          </div>
+        </div>
+
+        <!-- Funding Breakdown Grid -->
+        <div>
+          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">재원별 분담 상세</h4>
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+              <span class="text-[11px] font-semibold text-emerald-700 block">국비</span>
+              <span id="modalGovFund" class="text-sm font-bold text-emerald-900 block mt-0.5">-</span>
+              <span id="modalGovRatio" class="text-[10px] text-emerald-600 block mt-0.5">0%</span>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-100">
+              <span class="text-[11px] font-semibold text-amber-700 block">도비</span>
+              <span id="modalProvFund" class="text-sm font-bold text-amber-900 block mt-0.5">-</span>
+              <span id="modalProvRatio" class="text-[10px] text-amber-600 block mt-0.5">0%</span>
+            </div>
+            <div class="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+              <span class="text-[11px] font-semibold text-indigo-700 block">시비</span>
+              <span id="modalCityFund" class="text-sm font-bold text-indigo-900 block mt-0.5">-</span>
+              <span id="modalCityRatio" class="text-[10px] text-indigo-600 block mt-0.5">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Beneficiary and Purpose Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/50">
+            <span class="text-xs text-slate-500 font-medium block">사업 목적 구분</span>
+            <span id="modalPurpose" class="text-sm font-bold text-slate-800 block mt-1">운수업체 지원금</span>
+          </div>
+          <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/50">
+            <span class="text-xs text-slate-500 font-medium block">수혜 인원 및 1인당 금액</span>
+            <div class="text-sm font-bold text-slate-800 mt-1 flex items-baseline justify-between">
+              <span id="modalBeneficiaries">351,261명</span>
+              <span id="modalPerCapita" class="text-xs font-semibold text-blue-600">18,505원/년</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">사업 내용 및 추진 목적</h4>
+          <div id="modalDescription" class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed text-slate-700 whitespace-pre-line">
+            사업 설명 내용이 들어갑니다.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 text-xs font-semibold bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-700">남양주시 교통국 대중교통과</span>
+        <span>•</span>
+        <span>2026 회계연도 본예산 현황 관리</span>
+      </div>
+      <div>
+        총 세출 규모: 92,112,907,000원 | 53개 단위/세부 사업
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Action Buttons (메인 홈 복귀 & 플로팅 Top 진행률 링 버튼) -->
+  <aside id="floating-actions" aria-label="빠른 이동 내비게이션" class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3 no-print">
+    <!-- 1. 메인 리포트(index.html)로 돌아가기 버튼 -->
+    <a href="index.html" 
+       class="group relative flex items-center justify-center w-12 h-12 bg-white text-blue-600 rounded-full shadow-lg border border-slate-200/90 hover:border-blue-400 hover:bg-blue-50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+       title="남양주시 대중교통 예산 주민수혜도 분석(메인)으로 돌아가기"
+       aria-label="메인 리포트로 돌아가기">
+      <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+      </svg>
+      <!-- Hover Tooltip -->
+      <span class="pointer-events-none absolute right-full mr-2.5 px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 rounded-lg shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        수혜도 분석 홈
+      </span>
+    </a>
+
+    <!-- 2. 플로팅 Top 버튼 with 원형 스크롤 진행률(Progress) 링 -->
+    <div id="scroll-top-wrapper" class="relative opacity-0 scale-75 pointer-events-none transition-all duration-300 ease-out">
+      <button id="btn-scroll-top" onclick="scrollToTop()"
+              class="group relative flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg border border-slate-200/90 hover:border-blue-400 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+              title="최상단으로 이동"
+              aria-label="최상단으로 스크롤">
+        <!-- SVG Progress Ring -->
+        <svg class="absolute inset-0 w-12 h-12 -rotate-90 pointer-events-none" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="21" fill="none" stroke="#f1f5f9" stroke-width="3"></circle>
+          <circle id="scroll-progress-ring" cx="24" cy="24" r="21" fill="none" stroke="#2563eb" stroke-width="3"
+                  stroke-dasharray="131.95" stroke-dashoffset="131.95" stroke-linecap="round"
+                  class="transition-[stroke-dashoffset] duration-75 ease-linear"></circle>
+        </svg>
+
+        <!-- Up Arrow Icon -->
+        <svg class="w-5 h-5 text-slate-700 group-hover:text-blue-600 transition-transform group-hover:-translate-y-0.5 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+      </button>
+
+      <!-- Hover Tooltip -->
+      <span class="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-2.5 px-2 py-0.5 text-[11px] font-medium text-slate-700 bg-white border border-slate-200 rounded-md shadow-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+        맨 위로
+      </span>
+    </div>
+  </aside>
+
+  <script>
+    // Complete 53 Dataset parsed from 01_2026 예산총괄.pdf
+    const budgetData = [
+      {
+        id: 1,
+        fundingNote: "시",
+        name: "운수업계 유가보조금 지원",
+        budget: 6500000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 6500000,
+        perCapita: 18505,
+        beneficiaries: 351261,
+        desc: "버스·택시 운송사업자의 연료비 부담 완화 및 안정적 운행 지원",
+        sector: "버스",
+        subSector: "버스, 택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 2,
+        fundingNote: "시",
+        name: "시내버스 재정지원",
+        budget: 1459046,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 1459046,
+        perCapita: 4154,
+        beneficiaries: 351261,
+        desc: "시내버스 운송손실 보전 및 안정적인 노선운행 유지",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 3,
+        fundingNote: "도(30)시(70)",
+        name: "농어촌공영버스 운행결손금 지원",
+        budget: 874260,
+        govFund: 0,
+        provFund: 262278,
+        cityFund: 611982,
+        perCapita: 2489,
+        beneficiaries: 351261,
+        desc: "교통취약지역 공영버스의 운행결손 지원",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 4,
+        fundingNote: "시",
+        name: "수도권통합요금 환승할인 손실부담금",
+        budget: 5562880,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 5562880,
+        perCapita: 15837,
+        beneficiaries: 351261,
+        desc: "수도권통합요금제에 따른 손실금 일부를 지원하여 버스업체 경영난 해소 및 시민교통편의 증진",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 5,
+        fundingNote: "도(40)시(60)",
+        name: "저상버스 운영비 지원",
+        budget: 55000,
+        govFund: 0,
+        provFund: 22000,
+        cityFund: 33000,
+        perCapita: 157,
+        beneficiaries: 351261,
+        desc: "민영제 노선 운행 CNG저상버스의 운영비 지원",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 6,
+        fundingNote: "국(50)도(7.5)시(42.5)",
+        name: "저상버스 도입비 지원",
+        budget: 4872000,
+        govFund: 2436000,
+        provFund: 365400,
+        cityFund: 2070600,
+        perCapita: 13870,
+        beneficiaries: 351261,
+        desc: "교통약자의 버스 이용 편의 증진을 위한 저상버스 도입비 일부 지원",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 7,
+        fundingNote: "시",
+        name: "시내버스 운송업체 경영 및 서비스 개선 지원",
+        budget: 437481,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 437481,
+        perCapita: 1245,
+        beneficiaries: 351261,
+        desc: "시내버스 운송업체의 경영 안정 및 대중교통 서비스 개선",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 8,
+        fundingNote: "시",
+        name: "벽지노선 공영버스 운행결손금 지원",
+        budget: 960000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 960000,
+        perCapita: 2733,
+        beneficiaries: 351261,
+        desc: "대중교통 취약지역 벽지노선의 안정적 운행 지원",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 9,
+        fundingNote: "국(30)시(70)",
+        name: "국비 벽지노선 지원",
+        budget: 426809,
+        govFund: 128043,
+        provFund: 0,
+        cityFund: 298766,
+        perCapita: 1215,
+        beneficiaries: 351261,
+        desc: "벽지노선 운행손실 지원",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 10,
+        fundingNote: "시",
+        name: "마을버스 재정지원",
+        budget: 1300000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 1300000,
+        perCapita: 3701,
+        beneficiaries: 351261,
+        desc: "마을버스 운송적자 보전 및 서비스 개선",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 11,
+        fundingNote: "도(30)시(70)",
+        name: "마을버스 운수종사자 처우개선비 지원사업",
+        budget: 391200,
+        govFund: 0,
+        provFund: 117360,
+        cityFund: 273840,
+        perCapita: 1114,
+        beneficiaries: 351261,
+        desc: "마을버스 운수종사자 처우개선 및 안정적 인력 확보",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 12,
+        fundingNote: "시",
+        name: "시내 및 마을버스 청소년요금할인 결손보전",
+        budget: 447767,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 447767,
+        perCapita: 1275,
+        beneficiaries: 351261,
+        desc: "시내 및 마을버스 청소년 요금할인에 따른 운송적자 보전",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 13,
+        fundingNote: "시",
+        name: "브랜드콜택시 운영비 지원",
+        budget: 85889,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 85889,
+        perCapita: 56543,
+        beneficiaries: 1519,
+        desc: "브랜드콜택시 운영 및 콜 서비스 활성화 지원",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 14,
+        fundingNote: "도(37.5)시(62.5)",
+        name: "택시 카드단말기 통신료 지원",
+        budget: 68271,
+        govFund: 0,
+        provFund: 25602,
+        cityFund: 42669,
+        perCapita: 44945,
+        beneficiaries: 1519,
+        desc: "택시운송사업자 재정부담 완화 및 카드이용 활성화 도모",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 15,
+        fundingNote: "도(30)시(70)",
+        name: "택시 카드수수료 지원",
+        budget: 464000,
+        govFund: 0,
+        provFund: 139200,
+        cityFund: 324800,
+        perCapita: 305464,
+        beneficiaries: 1519,
+        desc: "택시운송사업자 재정부담 완화 및 소액 카드결제 수수료 지원",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 16,
+        fundingNote: "균(50)시(50)",
+        name: "공공형 택시 운영",
+        budget: 144000,
+        govFund: 72000,
+        provFund: 0,
+        cityFund: 72000,
+        perCapita: 94799,
+        beneficiaries: 1519,
+        desc: "대중교통 취약지역 거주민을 대상으로 인근 거점까지 운행하는 맞춤형 교통서비스 제공",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 17,
+        fundingNote: "균(50)시(50)",
+        name: "공공형 버스 운영",
+        budget: 1442000,
+        govFund: 721000,
+        provFund: 0,
+        cityFund: 721000,
+        perCapita: 4105,
+        beneficiaries: 351261,
+        desc: "교통취약지역의 도시형 교통모델 노선 운영 지원",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 18,
+        fundingNote: "도(59)시(41)",
+        name: "법인택시 운수종사자 처우개선 지원",
+        budget: 795600,
+        govFund: 0,
+        provFund: 471240,
+        cityFund: 324360,
+        perCapita: 83739,
+        beneficiaries: 1519,
+        desc: "열악한 근로환경의 법인택시 운수종사자 처우 향상 및 처우개선수당 지급",
+        sector: "택시",
+        purpose: "택시기사 지원비"
+      },
+      {
+        id: 19,
+        fundingNote: "도(30)시(70)",
+        name: "법인택시 운수종사자 단체보험료 지원",
+        budget: 127200,
+        govFund: 0,
+        provFund: 38160,
+        cityFund: 89040,
+        perCapita: 83739,
+        beneficiaries: 1519,
+        desc: "일반(법인)택시 운수종사자 단체보험료 지원으로 근무 안정망 확보",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 20,
+        fundingNote: "시",
+        name: "고요한 택시 도입 지원",
+        budget: 6480,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 6480,
+        perCapita: 4266,
+        beneficiaries: 1519,
+        desc: "청각장애인 고요한택시 프로그램을 도입한 택시법인에 대해 프로그램 이용 및 유지비용 지원",
+        sector: "택시",
+        purpose: "택시기사 지원비"
+      },
+      {
+        id: 21,
+        fundingNote: "도(30)시(70)",
+        name: "농어촌공영버스 구입 지원",
+        budget: 19600,
+        govFund: 0,
+        provFund: 5880,
+        cityFund: 13720,
+        perCapita: 56,
+        beneficiaries: 351261,
+        desc: "농어촌공영버스 노후 차량 교체 및 신규 차량 구입 지원",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 22,
+        fundingNote: "시",
+        name: "땡큐버스 운영비 지원",
+        budget: 7600000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 7600000,
+        perCapita: 21636,
+        beneficiaries: 351261,
+        desc: "남양주시 고유 브랜드 땡큐버스 운행손실 지원 및 안정적인 내부 거점순환 노선운행 유지",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 23,
+        fundingNote: "시",
+        name: "대광위 광역버스 준공영제 사업",
+        budget: 10856113,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 10856113,
+        perCapita: 30906,
+        beneficiaries: 351261,
+        desc: "대도시권광역교통위원회 서울시 진입 광역버스 준공영제 추진 및 분담금 지원",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 24,
+        fundingNote: "시",
+        name: "경기도 공공버스 운영지원",
+        budget: 269737,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 269737,
+        perCapita: 768,
+        beneficiaries: 351261,
+        desc: "경기도 도내 시군간 운행 광역버스 준공영제 추진 및 운영 지원",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 25,
+        fundingNote: "시",
+        name: "전세버스 활용 증회운행 지원사업",
+        budget: 780860,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 780860,
+        perCapita: 2223,
+        beneficiaries: 351261,
+        desc: "출퇴근시간 혼잡 노선 이용객 편의증진을 위한 전세버스 등을 활용한 증회운행 지원(임차료 지원)",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 26,
+        fundingNote: "시",
+        name: "시내버스 공공관리제 운영",
+        budget: 8934542,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 8934542,
+        perCapita: 25436,
+        beneficiaries: 351261,
+        desc: "시군 간 운행 시내버스 공공관리제 전환 노선 운영비 분담",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 27,
+        fundingNote: "도(30)시(70)",
+        name: "시내버스 공공관리제 운영 지원(자체/지원)",
+        budget: 7606140,
+        govFund: 0,
+        provFund: 2281842,
+        cityFund: 5324298,
+        perCapita: 21654,
+        beneficiaries: 351261,
+        desc: "시 주관 시내버스 공공관리제 노선 운영비 지원",
+        sector: "버스",
+        purpose: "적자결손 보전금"
+      },
+      {
+        id: 28,
+        fundingNote: "시",
+        name: "대광위 광역교통개선대책 재정지원",
+        budget: 2631500,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 2631500,
+        perCapita: 7492,
+        beneficiaries: 351261,
+        desc: "다산·지금·별내지구 등 신도시 버스 증차운행 지원을 통한 대중교통 불편 해소",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 29,
+        fundingNote: "도(30)시(70)",
+        name: "노후택시 대폐차 비용 지원사업",
+        budget: 28000,
+        govFund: 0,
+        provFund: 8400,
+        cityFund: 19600,
+        perCapita: 18433,
+        beneficiaries: 1519,
+        desc: "노후택시 대차비용 일부 지원을 통하여 택시운수사업자 재정부담 완화 및 안전성 향상",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 30,
+        fundingNote: "시",
+        name: "시내버스 공공관리제 운영위원회 운영",
+        budget: 1300,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 1300,
+        perCapita: 4,
+        beneficiaries: 351261,
+        desc: "시내버스 공공관리제 관련 심의·자문위원회 참석수당 및 운영경비",
+        sector: "버스",
+        purpose: "행정비용"
+      },
+      {
+        id: 31,
+        fundingNote: "도(30)시(70)",
+        name: "2026년 버스차고지 시설개선 사업",
+        budget: 54573,
+        govFund: 0,
+        provFund: 16372,
+        cityFund: 38201,
+        perCapita: 155,
+        beneficiaries: 351261,
+        desc: "운수업체 버스차고지 시설 개선을 지원함으로써 노선버스의 안정적인 운행 환경 도모",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 32,
+        fundingNote: "시",
+        name: "경기도 버스 운수종사자 양성 사업",
+        budget: 86636,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 86636,
+        perCapita: 247,
+        beneficiaries: 351261,
+        desc: "원활한 버스 운수종사자 확보를 위한 맞춤형 양성 사업 추진(한국교통안전공단 위탁)",
+        sector: "버스",
+        purpose: "버스기사 지원비"
+      },
+      {
+        id: 33,
+        fundingNote: "도(30)시(70)",
+        name: "광역버스 공공와이파이 구축 지원",
+        budget: 74899,
+        govFund: 0,
+        provFund: 22470,
+        cityFund: 52429,
+        perCapita: 213,
+        beneficiaries: 351261,
+        desc: "광역버스에 설치된 공공와이파이 통신비 지원(181대분)",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 34,
+        fundingNote: "시",
+        name: "마을, 땡큐버스 등 운송수입금 조사 용역",
+        budget: 20000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 20000,
+        perCapita: 57,
+        beneficiaries: 351261,
+        desc: "마을버스, 땡큐버스, 벽지노선 등 운송수입금 실사 조사 및 재정지원 산정기초 마련",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 35,
+        fundingNote: "시",
+        name: "모범운전자회 보조",
+        budget: 47571,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 47571,
+        perCapita: 31317,
+        beneficiaries: 1519,
+        desc: "교통안전캠페인 및 시 주관 행사 등 자발적 교통봉사활동에 대한 운영비 지원",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 36,
+        fundingNote: "시",
+        name: "대중교통 행정지원",
+        budget: 10620,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 10620,
+        perCapita: 30,
+        beneficiaries: 351261,
+        desc: "대중교통 정책 홍보 및 대시민 안내 책자 제작 등",
+        sector: "행정",
+        purpose: "행정비용"
+      },
+      {
+        id: 37,
+        fundingNote: "시",
+        name: "버스승강장 확충 및 개선사업",
+        budget: 420000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 420000,
+        perCapita: 1196,
+        beneficiaries: 351261,
+        desc: "버스승강장 교체 및 신설을 통한 시민 쾌적성 향상",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 38,
+        fundingNote: "시",
+        name: "버스승강장 유지 보수",
+        budget: 400000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 400000,
+        perCapita: 1139,
+        beneficiaries: 351261,
+        desc: "노후 및 파손 버스승강장 시설물 상시 유지보수",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 39,
+        fundingNote: "시",
+        name: "남양주 택시 쉼터 운영",
+        budget: 77864,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 77864,
+        perCapita: 51260,
+        beneficiaries: 1519,
+        desc: "운수종사자 휴식 및 소통공간을 위한 쉼터 시설 운영, 쉼터 보강토옹벽 보수보강공사",
+        sector: "택시",
+        purpose: "택시기사 지원비"
+      },
+      {
+        id: 40,
+        fundingNote: "시",
+        name: "버스승강장 운영",
+        budget: 333294,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 333294,
+        perCapita: 949,
+        beneficiaries: 351261,
+        desc: "버스승강장 내 조명, BIT 등 공공전기요금 납부",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 41,
+        fundingNote: "시",
+        name: "버스승강장 청소관리",
+        budget: 687198,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 687198,
+        perCapita: 1956,
+        beneficiaries: 351261,
+        desc: "관내 버스승강장 고압세척 및 정기 위생 청소관리",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 42,
+        fundingNote: "시",
+        name: "스마트 승강장 유지관리",
+        budget: 208214,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 208214,
+        perCapita: 593,
+        beneficiaries: 351261,
+        desc: "스마트 버스승강장 공기정화, 냉난방기 유지관리 비용 및 공공요금 납부",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 43,
+        fundingNote: "시",
+        name: "시내버스 공공와이파이 확대 구축 사업",
+        budget: 102970,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 102970,
+        perCapita: 293,
+        beneficiaries: 351261,
+        desc: "시내버스에 설치된 공공와이파이 통신비 지원(463대분)",
+        sector: "버스",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 44,
+        fundingNote: "시",
+        name: "어린이청소년 교통비 지원 사업",
+        budget: 804064,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 804064,
+        perCapita: 2289,
+        beneficiaries: 351261,
+        desc: "경제적 자립도가 낮은 어린이·청소년들에게 교통비 지원(실제 통학 지원)",
+        sector: "교통비",
+        purpose: "교통카드(지역화폐) 지원"
+      },
+      {
+        id: 45,
+        fundingNote: "시",
+        name: "택시운행정보관리시스템(TIMS) 운영사업",
+        budget: 16600,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 16600,
+        perCapita: 10928,
+        beneficiaries: 1519,
+        desc: "택시운행정보관리시스템(TIMS) 통신 및 서버 통합관리",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 46,
+        fundingNote: "시",
+        name: "교통안전 질서계도",
+        budget: 48600,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 48600,
+        perCapita: 31995,
+        beneficiaries: 1519,
+        desc: "출퇴근시간 교통혼잡지 교통보조근무 참여자에 대한 급식비 및 활동지원",
+        sector: "택시",
+        purpose: "운수업체 지원금"
+      },
+      {
+        id: 47,
+        fundingNote: "시",
+        name: "어르신 교통비 지원사업",
+        budget: 5120396,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 5120396,
+        perCapita: 14577,
+        beneficiaries: 351261,
+        desc: "경제 및 교통약자인 고령세대(만 65세 이상)에게 실질적 교통 복지 혜택 제공 (분기별 환급)",
+        sector: "교통비",
+        purpose: "교통카드(지역화폐) 지원"
+      },
+      {
+        id: 48,
+        fundingNote: "시",
+        name: "택시 기반시설 유지보수",
+        budget: 22000,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 22000,
+        perCapita: 14483,
+        beneficiaries: 1519,
+        desc: "택시 기반시설(택시승차대, 쉘터)에 대한 정기 보수를 통해 편리하고 안전한 택시 서비스 환경 제공",
+        sector: "택시",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 49,
+        fundingNote: "시",
+        name: "택시표시등 교체 지원사업",
+        budget: 55629,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 55629,
+        perCapita: 36622,
+        beneficiaries: 1519,
+        desc: "노후된 택시표시등(캡라이트) 교체 지원을 통한 도시 미관 개선 및 택시산업 활성화",
+        sector: "택시",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 50,
+        fundingNote: "국(50)도(15)시(35)",
+        name: "K-패스 (대중교통비 환급)",
+        budget: 17835600,
+        govFund: 8936000,
+        provFund: 2680800,
+        cityFund: 6218800,
+        perCapita: 50776,
+        beneficiaries: 351261,
+        desc: "전 국민 대중교통 이용 촉진 및 교통비 부담 완화를 위한 월 이용요금 일정비율(20~53%) 사후 환급",
+        sector: "교통비",
+        purpose: "교통카드(지역화폐) 지원"
+      },
+      {
+        id: 51,
+        fundingNote: "시",
+        name: "The 경기패스(도비 연계 추가지원)",
+        budget: 363940,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 363940,
+        perCapita: 1036,
+        beneficiaries: 351261,
+        desc: "청년 나이 확대 및 전국 대중교통 이용 횟수 무제한 비례 요금 지원",
+        sector: "교통비",
+        purpose: "교통카드(지역화폐) 지원"
+      },
+      {
+        id: 52,
+        fundingNote: "도(30)시(70)",
+        name: "광역버스 환승정류장 시설개선 사업",
+        budget: 120000,
+        govFund: 0,
+        provFund: 36000,
+        cityFund: 84000,
+        perCapita: 342,
+        beneficiaries: 351261,
+        desc: "광역버스 주요 환승정류장 대기공간 및 냉난방 편의시설 개선",
+        sector: "시설",
+        purpose: "주민편의시설"
+      },
+      {
+        id: 53,
+        fundingNote: "시",
+        name: "기본경비",
+        budget: 54564,
+        govFund: 0,
+        provFund: 0,
+        cityFund: 54564,
+        perCapita: 155,
+        beneficiaries: 351261,
+        desc: "대중교통과 부서 일반 행정운영경비 및 사무관리비",
+        sector: "행정",
+        purpose: "행정비용"
+      }
+    ];
+
+    // State variables
+    let currentFilteredData = [...budgetData];
+    let sortColumn = 'id';
+    let sortAsc = true;
+
+    // Charts instances
+    let fundingChartInst = null;
+    let sectorChartInst = null;
+    let topProjectsChartInst = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initCharts();
+      renderTable();
+    });
+
+    // Formatting helpers
+    function formatNumber(num) {
+      return (num || 0).toLocaleString('ko-KR');
+    }
+
+    function formatToEok(thousandWon) {
+      // 1천원 * 1,000 = 원. 1억 = 100,000 천원
+      const eok = (thousandWon / 100000).toFixed(1);
+      return `${eok}억 원`;
+    }
+
+    // Chart initialization
+    function initCharts() {
+      // 1. Funding Breakdown Doughnut Chart
+      const ctxFunding = document.getElementById('fundingChart').getContext('2d');
+      fundingChartInst = new Chart(ctxFunding, {
+        type: 'doughnut',
+        data: {
+          labels: ['시비 (79.6%)', '국비 (13.3%)', '도비 (7.0%)'],
+          datasets: [{
+            data: [73326860, 12293043, 6493004],
+            backgroundColor: ['#4f46e5', '#10b981', '#f59e0b'],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 12, font: { family: 'Pretendard', size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw;
+                  const eok = (val / 100000).toFixed(1);
+                  return ` ${context.label}: ${formatNumber(val)} 천원 (${eok}억)`;
+                }
+              }
+            }
+          },
+          cutout: '68%'
+        }
+      });
+
+      // 2. Sector Bar Chart
+      // Calculate sums per sector
+      const sectorTotals = {};
+      budgetData.forEach(d => {
+        sectorTotals[d.sector] = (sectorTotals[d.sector] || 0) + d.budget;
+      });
+
+      const sectorLabels = ['버스', '교통비', '택시', '시설', '행정'];
+      const sectorData = sectorLabels.map(l => (sectorTotals[l] / 100000).toFixed(1));
+
+      const ctxSector = document.getElementById('sectorChart').getContext('2d');
+      sectorChartInst = new Chart(ctxSector, {
+        type: 'bar',
+        data: {
+          labels: sectorLabels,
+          datasets: [{
+            label: '예산액 (억 원)',
+            data: sectorData,
+            backgroundColor: [
+              'rgba(37, 99, 235, 0.85)',
+              'rgba(14, 165, 233, 0.85)',
+              'rgba(245, 158, 11, 0.85)',
+              'rgba(16, 185, 129, 0.85)',
+              'rgba(100, 116, 139, 0.85)'
+            ],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.parsed.y}억 원`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              ticks: { font: { size: 11 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { family: 'Pretendard', size: 11, weight: 600 } }
+            }
+          }
+        }
+      });
+
+      // 3. Top 5 Major Projects
+      const sortedTop = [...budgetData].sort((a,b) => b.budget - a.budget).slice(0, 5);
+      const topLabels = sortedTop.map(d => d.name.length > 9 ? d.name.substring(0, 9) + '…' : d.name);
+      const topBudgets = sortedTop.map(d => (d.budget / 100000).toFixed(1));
+
+      const ctxTop = document.getElementById('topProjectsChart').getContext('2d');
+      topProjectsChartInst = new Chart(ctxTop, {
+        type: 'bar',
+        data: {
+          labels: topLabels,
+          datasets: [{
+            axis: 'y',
+            data: topBudgets,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (items) => sortedTop[items[0].dataIndex].name,
+                label: (ctx) => ` ${ctx.parsed.x}억 원 (${formatNumber(sortedTop[ctx.dataIndex].budget)} 천원)`
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              ticks: { font: { size: 10 } }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { font: { family: 'Pretendard', size: 11 } }
+            }
+          }
+        }
+      });
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const sector = document.getElementById('sectorFilter').value;
+      const purpose = document.getElementById('purposeFilter').value;
+      const fundType = document.getElementById('fundTypeFilter').value;
+
+      // Show/Hide search clear button
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      currentFilteredData = budgetData.filter(item => {
+        // Text Search
+        const matchQuery = !query || 
+          item.name.toLowerCase().includes(query) || 
+          item.desc.toLowerCase().includes(query) ||
+          item.purpose.toLowerCase().includes(query);
+
+        // Sector Filter
+        const matchSector = (sector === 'ALL') || (item.sector === sector);
+
+        // Purpose Filter
+        const matchPurpose = (purpose === 'ALL') || (item.purpose === purpose);
+
+        // Funding Type Filter
+        let matchFund = true;
+        if (fundType === 'ONLY_CITY') {
+          matchFund = item.govFund === 0 && item.provFund === 0;
+        } else if (fundType === 'HAS_GOV') {
+          matchFund = item.govFund > 0;
+        } else if (fundType === 'HAS_PROV') {
+          matchFund = item.provFund > 0;
+        } else if (fundType === 'MATCH') {
+          matchFund = item.govFund > 0 || item.provFund > 0;
+        }
+
+        return matchQuery && matchSector && matchPurpose && matchFund;
+      });
+
+      // Apply current sort
+      sortData();
+      renderTable();
+      updateFilteredKPIs();
+    }
+
+    function sortTable(col) {
+      if (sortColumn === col) {
+        sortAsc = !sortAsc;
+      } else {
+        sortColumn = col;
+        sortAsc = (col === 'budget' || col === 'perCapita') ? false : true;
+      }
+      sortData();
+      renderTable();
+    }
+
+    function sortData() {
+      currentFilteredData.sort((a, b) => {
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
+
+        if (typeof valA === 'string') {
+          return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        } else {
+          return sortAsc ? (valA - valB) : (valB - valA);
+        }
+      });
+    }
+
+    function updateFilteredKPIs() {
+      const count = currentFilteredData.length;
+      const totalBudget = currentFilteredData.reduce((acc, curr) => acc + curr.budget, 0);
+
+      document.getElementById('filteredCount').innerText = count;
+      document.getElementById('filteredTotalBudget').innerText = `${formatNumber(totalBudget)} 천원`;
+      document.getElementById('filteredBudgetInEok').innerText = `(약 ${formatToEok(totalBudget)})`;
+      document.getElementById('tablePageInfo').innerText = count;
+
+      const noResults = document.getElementById('noResultsState');
+      const tableBody = document.getElementById('budgetTableBody');
+
+      if (count === 0) {
+        noResults.classList.remove('hidden');
+        tableBody.classList.add('hidden');
+      } else {
+        noResults.classList.add('hidden');
+        tableBody.classList.remove('hidden');
+      }
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      applyFilters();
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('sectorFilter').value = 'ALL';
+      document.getElementById('purposeFilter').value = 'ALL';
+      document.getElementById('fundTypeFilter').value = 'ALL';
+      sortColumn = 'id';
+      sortAsc = true;
+      applyFilters();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('budgetTableBody');
+      tbody.innerHTML = '';
+
+      currentFilteredData.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-blue-50/50 transition cursor-pointer group border-b border-slate-100';
+        tr.onclick = (e) => {
+          // Open detail modal
+          openModal(item.id);
+        };
+
+        // Sector Badge Style
+        let sectorBadgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+        if (item.sector === '택시') sectorBadgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+        if (item.sector === '교통비') sectorBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        if (item.sector === '시설') sectorBadgeClass = 'bg-purple-50 text-purple-700 border-purple-200';
+        if (item.sector === '행정') sectorBadgeClass = 'bg-slate-100 text-slate-700 border-slate-200';
+
+        // Funding Note Badge Style
+        let fundStyle = 'text-slate-500 bg-slate-100';
+        if (item.fundingNote.includes('국')) {
+          fundStyle = 'text-emerald-700 bg-emerald-50 border border-emerald-200';
+        } else if (item.fundingNote.includes('도')) {
+          fundStyle = 'text-amber-700 bg-amber-50 border border-amber-200';
+        }
+
+        tr.innerHTML = `
+          <td class="py-3 px-3.5 text-center font-mono font-medium text-slate-400 group-hover:text-blue-600">${item.id}</td>
+          <td class="py-3 px-2 text-center">
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${fundStyle}">${item.fundingNote || '시'}</span>
+          </td>
+          <td class="py-3 px-4 font-semibold text-slate-800 group-hover:text-blue-600 transition">
+            <div class="flex items-center gap-1.5">
+              <span>${item.name}</span>
+            </div>
+          </td>
+          <td class="py-3 px-4 text-right font-mono font-bold text-slate-900">
+            ${formatNumber(item.budget)}
+            <span class="text-[10px] text-slate-400 font-normal block sm:inline">(${formatToEok(item.budget)})</span>
+          </td>
+          <td class="py-3 px-3 text-right font-mono text-slate-500 hidden md:table-cell">
+            ${item.govFund > 0 ? formatNumber(item.govFund) : '<span class="text-slate-300">-</span>'}
+          </td>
+          <td class="py-3 px-3 text-right font-mono text-slate-500 hidden md:table-cell">
+            ${item.provFund > 0 ? formatNumber(item.provFund) : '<span class="text-slate-300">-</span>'}
+          </td>
+          <td class="py-3 px-3 text-right font-mono text-slate-600 hidden sm:table-cell font-medium">
+            ${formatNumber(item.cityFund)}
+          </td>
+          <td class="py-3 px-3 text-center">
+            <span class="text-[11px] font-medium px-2 py-0.5 rounded-full border ${sectorBadgeClass}">${item.sector}</span>
+          </td>
+          <td class="py-3 px-3 text-center text-slate-600 font-medium">
+            <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-700">${item.purpose}</span>
+          </td>
+          <td class="py-3 px-3 text-right font-mono text-slate-500 hidden lg:table-cell">
+            ${item.perCapita ? formatNumber(item.perCapita) + '원' : '-'}
+          </td>
+          <td class="py-3 px-4 text-center">
+            <button class="text-slate-400 group-hover:text-blue-600 hover:bg-blue-100 p-1.5 rounded-lg transition" title="상세보기">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      lucide.createIcons();
+    }
+
+    function openModal(id) {
+      const item = budgetData.find(d => d.id === id);
+      if (!item) return;
+
+      document.getElementById('modalIdBadge').innerText = `연번 ${item.id}`;
+      document.getElementById('modalSectorBadge').innerText = item.sector;
+      document.getElementById('modalFundBadge').innerText = item.fundingNote || '시비 100%';
+      document.getElementById('modalTitle').innerText = item.name;
+      
+      document.getElementById('modalTotalBudget').innerText = formatNumber(item.budget);
+      document.getElementById('modalBudgetEok').innerText = `약 ${formatToEok(item.budget)}`;
+
+      // Fund calculation
+      const govPercent = ((item.govFund / item.budget) * 100).toFixed(1);
+      const provPercent = ((item.provFund / item.budget) * 100).toFixed(1);
+      const cityPercent = ((item.cityFund / item.budget) * 100).toFixed(1);
+
+      document.getElementById('modalGovFund').innerText = item.govFund > 0 ? `${formatNumber(item.govFund)} 천원` : '-';
+      document.getElementById('modalGovRatio').innerText = item.govFund > 0 ? `${govPercent}%` : '0%';
+
+      document.getElementById('modalProvFund').innerText = item.provFund > 0 ? `${formatNumber(item.provFund)} 천원` : '-';
+      document.getElementById('modalProvRatio').innerText = item.provFund > 0 ? `${provPercent}%` : '0%';
+
+      document.getElementById('modalCityFund').innerText = `${formatNumber(item.cityFund)} 천원`;
+      document.getElementById('modalCityRatio').innerText = `${cityPercent}%`;
+
+      document.getElementById('modalPurpose').innerText = item.purpose;
+      document.getElementById('modalBeneficiaries').innerText = `${formatNumber(item.beneficiaries)}명`;
+      document.getElementById('modalPerCapita').innerText = item.perCapita ? `${formatNumber(item.perCapita)}원 / 년` : '-';
+
+      document.getElementById('modalDescription').innerText = item.desc || '등록된 상세 설명이 없습니다.';
+
+      document.getElementById('projectModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('projectModal').classList.add('hidden');
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('projectModal').addEventListener('click', (e) => {
+      if (e.target.id === 'projectModal') closeModal();
+    });
+
+    // Close on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // CSV Export function
+    function exportToCSV() {
+      let csv = '\uFEFF'; // UTF-8 BOM
+      csv += '연번,국도비구분,사업명,예산액(천원),국비(천원),도비(천원),시비(천원),1인당수혜액(원),연간수혜인원(명),지원분야,사업목적,사업내용\n';
+
+      budgetData.forEach(item => {
+        const cleanDesc = `"${(item.desc || '').replace(/"/g, '""')}"`;
+        const cleanName = `"${item.name.replace(/"/g, '""')}"`;
+        csv += `${item.id},"${item.fundingNote || ''}",${cleanName},${item.budget},${item.govFund},${item.provFund},${item.cityFund},${item.perCapita || ''},${item.beneficiaries || ''},"${item.sector}","${item.purpose}",${cleanDesc}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', '2026_대중교통과_예산총괄.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    // Smooth Scroll to Top & Scroll Progress Ring Logic
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    function initFloatingScrollTop() {
+      const wrapper = document.getElementById('scroll-top-wrapper');
+      const progressRing = document.getElementById('scroll-progress-ring');
+      if (!wrapper || !progressRing) return;
+
+      const totalLength = 131.95; // 2 * Math.PI * 21
+
+      function handleScroll() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+        // 1. 자동 감지 및 표시: 스크롤이 아래로 내려갔을 때(250px 초과) 페이드/스케일 표시
+        if (scrollTop > 250) {
+          wrapper.classList.remove('opacity-0', 'scale-75', 'pointer-events-none');
+          wrapper.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+        } else {
+          wrapper.classList.add('opacity-0', 'scale-75', 'pointer-events-none');
+          wrapper.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+
+        // 2. 스크롤 진행률(Progress) 원형 링 업데이트
+        if (scrollHeight > 0) {
+          const progress = Math.min(Math.max(scrollTop / scrollHeight, 0), 1);
+          const offset = totalLength - (progress * totalLength);
+          progressRing.style.strokeDashoffset = offset;
+        }
+      }
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll(); // 초기 상태 반영
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initFloatingScrollTop();
+    });
+  </script>
+</body>
+</html>
