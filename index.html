@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>남양주시 대중교통 예산 주민수혜도 분석 리포트</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            },
+            nyjBlue: '#1e40af',
+            nyjGreen: '#059669',
+            nyjAmber: '#d97706',
+            nyjPurple: '#7c3aed',
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    .gradient-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0369a1 100%);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; color: black; }
+      .shadow-sm, .shadow-md, .shadow-xl { shadow: none; }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- Top Global Header -->
+  <header class="gradient-hero text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-center py-4 border-b border-white/10 gap-3">
+        <div class="flex items-center gap-3">
+          <div class="bg-blue-500/20 border border-blue-400/30 p-2.5 rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-bus-simple text-2xl text-blue-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                시민주권시대 남양주 대전환
+              </span>
+              <span class="text-xs text-slate-300">2026. 1회 추경 기준</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1">
+              남양주시 대중교통 예산 주민수혜도 분석
+            </h1>
+          </div>
+        </div>
+
+        <!-- Meta info & Actions -->
+        <div class="flex flex-wrap items-center gap-3 no-print">
+          <div class="text-right text-xs text-slate-300 hidden sm:block">
+            <p><i class="fa-regular fa-calendar-check mr-1"></i> 분석일자: 2026. 10. 6.(화)</p>
+            <p><i class="fa-solid fa-building-columns mr-1"></i> 대중교통과</p>
+          </div>
+          <button onclick="window.print()" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium border border-white/20 transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-print"></i> 보고서 인쇄
+          </button>
+          <button onclick="scrollToSection('calculator')" class="px-3.5 py-2 bg-sky-500 hover:bg-sky-400 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-calculator"></i> 내 수혜액 계산
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- Objective Banner -->
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+          <i class="fa-solid fa-bullseye text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">분석 배경 및 추진 목적</h2>
+          <p class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+            "남양주시 대중교통 예산 구성 현황을 살피고 1인당 수혜도를 정밀 분석하여 시민주권 행정 기초자료 마련"
+          </p>
+          <p class="text-xs text-slate-500 mt-1">
+            대중교통 이용객(약 351,261명)과 택시 운수종사자(약 1,519명)의 실제 혜택 귀속을 반영한 체감형 수혜 추정
+          </p>
+        </div>
+      </div>
+
+      <!-- Currency Unit Switcher -->
+      <div class="flex items-center gap-2 self-end md:self-center shrink-0 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs">
+        <span class="text-slate-500 font-medium px-2">표시 단위:</span>
+        <button id="btn-unit-krw" onclick="setCurrencyUnit('krw')" class="px-2.5 py-1 rounded-lg font-medium transition text-slate-600 hover:text-slate-900">
+          원 (￦)
+        </button>
+        <button id="btn-unit-thous" onclick="setCurrencyUnit('thous')" class="px-2.5 py-1 rounded-lg font-bold bg-white text-blue-700 shadow-xs border border-slate-200">
+          천원 (공식 원문)
+        </button>
+        <button id="btn-unit-eok" onclick="setCurrencyUnit('eok')" class="px-2.5 py-1 rounded-lg font-medium transition text-slate-600 hover:text-slate-900">
+          억원
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Section: 4 Key High-Level Figures -->
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-blue-600"></i>
+          1. 핵심 예산 및 주민 수혜 지표 요약
+        </h3>
+        <span class="text-xs text-slate-500">기준: 2026년 제1회 추가경정예산 (인구: 26.9 기준 727,066명)</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: 총 예산 -->
+        <div class="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+          <div class="absolute -right-3 -bottom-3 text-white/10 text-8xl pointer-events-none">
+            <i class="fa-solid fa-won-sign"></i>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-white/20 text-blue-100">총 예산 규모</span>
+            <i class="fa-solid fa-coins text-blue-300"></i>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight" id="kpi-total-budget">
+              92,112,907천원
+            </div>
+            <p class="text-xs text-blue-200 mt-1">대중교통과 전체 예산 (약 921.1억 원)</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/10 flex justify-between text-xs text-blue-200">
+            <span>사업 목적별 5개 분야</span>
+            <span class="text-white font-medium">100% 집행 예정</span>
+          </div>
+        </div>
+
+        <!-- Card 2: 단순 주민 안분액 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-blue-300 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">단순 주민 안분액</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i class="fa-solid fa-user-group text-sm"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              126,691원
+            </div>
+            <p class="text-xs text-slate-500 mt-1">남양주시 전체 인구(727,066명) 단순 균등 배분</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+            <span>인구 기준</span>
+            <span class="text-slate-700 font-semibold">2026. 9월 72.7만 명</span>
+          </div>
+        </div>
+
+        <!-- Card 3: 실질 1인당 수혜액 (Highlight) -->
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+          <div class="absolute -right-2 -bottom-2 text-white/15 text-8xl pointer-events-none">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-base sm:text-lg font-black px-3 py-1 rounded-lg bg-yellow-300 text-slate-950 shadow-md border border-yellow-100/70 inline-flex items-center gap-1.5 tracking-tight">
+              <i class="fa-solid fa-bullseye text-amber-700 text-sm"></i>
+              실제 수혜 대상자 기준
+            </span>
+            <i class="fa-solid fa-sparkles text-amber-200"></i>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              1,041,371원
+            </div>
+            <p class="text-xs text-amber-100 mt-1">∑(사업별 예산액 / 수혜 대상 인원)</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/20 flex justify-between text-xs text-amber-100">
+            <span>이용객 35.1만 / 기사 1,519명</span>
+            <span class="text-white font-bold underline">단순안분의 8.2배</span>
+          </div>
+        </div>
+
+        <!-- Card 4: 시비 부담률 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-blue-300 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700">시비 재원 비중</span>
+            <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+              <i class="fa-solid fa-landmark text-sm"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              79.60%
+            </div>
+            <p class="text-xs text-slate-500 mt-1" id="kpi-city-amount">시비 부담액: 73,326,860천원</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+            <span>국비 13.4% · 도비 7.1%</span>
+            <span class="text-rose-600 font-semibold">시 재정부담 가중</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Explanatory note on Beneficiary Formula -->
+    <div class="bg-amber-50/60 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 flex items-start gap-3">
+      <i class="fa-solid fa-circle-info text-amber-600 text-sm mt-0.5"></i>
+      <div class="leading-relaxed">
+        <strong class="font-bold text-amber-950">※ 주민 1인당 수혜금액 산정 방식 및 한계:</strong>
+        사업별 수혜 대상과 실제 대중교통 이용 빈도가 상이하여 단순 전 주민 대상 균등 산정 시 왜곡이 발생합니다. 이에 따라 본 분석에서는
+        <span class="font-bold text-amber-950 underline">대중교통 정기 이용객(약 351,261명)</span>과 
+        <span class="font-bold text-amber-950 underline">택시 운수종사자(약 1,519명)</span>를 대표 수혜 대상으로 사업별 가중 적용하여 
+        연간 1인당 <strong>1,041,371원</strong>의 실질적인 혜택이 귀속되는 것으로 산출하였습니다.
+      </div>
+    </div>
+
+    <!-- Section 2: 지원분야별 예산 현황 (Page 1 원본 인포그래픽 디지털 구현) -->
+    <section>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-4 border-b border-slate-200 gap-2">
+        <div>
+          <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-blue-600"></i>
+            2. 지원분야별 예산 현황 (총 92,112,907천원)
+          </h3>
+          <p class="text-xs text-slate-500">카드를 클릭하여 상세 내역과 정책 목적을 확인하세요.</p>
+        </div>
+        <div class="text-xs font-medium text-slate-500">
+          분야: 버스(69.2%) · 교통비지원(26.2%) · 정류장(2.4%) · 택시(2.2%) · 기타(0.1%)
+        </div>
+      </div>
+
+      <!-- 5 Sector Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+
+        <!-- 1. 버스 분야 (69.2%) -->
+        <div class="bg-white rounded-2xl border-2 border-emerald-500 shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-bus"></i>
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-600 text-white shadow-xs">
+                69.2%
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 mt-3">버 스</h4>
+            <div class="text-lg font-black text-emerald-600 mt-1 sector-val" data-val="63712740">
+              63,712,740천원
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">전체 예산의 2/3 이상 점유</p>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">적자결손보전금</span>
+                <span class="font-bold text-slate-900 sector-val" data-val="34306677">34,306,677천원</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">운수업체지원금</span>
+                <span class="font-bold text-slate-900 sector-val" data-val="29318127">29,318,127천원</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">기타 예산</span>
+                <span class="font-bold text-slate-900 sector-val" data-val="87936">87,936천원</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-2 text-[11px] text-emerald-700 bg-emerald-50 p-2 rounded-lg font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved"></i>
+            대중교통 안정 운행 기반 조성
+          </div>
+        </div>
+
+        <!-- 2. 교통비 지원 (26.2%) -->
+        <div class="bg-white rounded-2xl border-2 border-sky-500 shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-credit-card"></i>
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-sky-600 text-white shadow-xs">
+                26.2%
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 mt-3">교통비 지원</h4>
+            <div class="text-lg font-black text-sky-600 mt-1 sector-val" data-val="24124000">
+              24,124,000천원
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">시민 체감형 직접 혜택</p>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div class="bg-sky-50/70 p-2.5 rounded-lg border border-sky-100">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-sky-900 font-bold">교통비 직접 지원</span>
+                  <span class="font-extrabold text-sky-800 sector-val" data-val="24124000">24,124,000천원</span>
+                </div>
+                <p class="text-[11px] text-slate-500">청년·노인·어린이 대중교통 마일리지 및 환급 사업 등</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-2 text-[11px] text-sky-700 bg-sky-50 p-2 rounded-lg font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-wallet"></i>
+            가계 교통비 부담 직접 완화
+          </div>
+        </div>
+
+        <!-- 3. 버스정류장 (2.4%) -->
+        <div class="bg-white rounded-2xl border-2 border-indigo-400 shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-person-shelter"></i>
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-indigo-600 text-white shadow-xs">
+                2.4%
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 mt-3">버스정류장</h4>
+            <div class="text-lg font-black text-indigo-600 mt-1 sector-val" data-val="2223279">
+              2,223,279천원
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">시설 현대화 및 편의 증진</p>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div class="bg-indigo-50/70 p-2.5 rounded-lg border border-indigo-100">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-indigo-900 font-bold">주민편의시설</span>
+                  <span class="font-extrabold text-indigo-800 sector-val" data-val="2223279">2,223,279천원</span>
+                </div>
+                <p class="text-[11px] text-slate-500">온열의자, 스마트 쉼터쉘터, 버스도착안내단말기(BIT) 확충</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-2 text-[11px] text-indigo-700 bg-indigo-50 p-2 rounded-lg font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-couch"></i>
+            쾌적한 대기환경 인프라
+          </div>
+        </div>
+
+        <!-- 4. 택시 (2.2%) -->
+        <div class="bg-white rounded-2xl border-2 border-purple-400 shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-taxi"></i>
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-purple-600 text-white shadow-xs">
+                2.2%
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 mt-3">택 시</h4>
+            <div class="text-lg font-black text-purple-600 mt-1 sector-val" data-val="1987704">
+              1,987,704천원
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">보완적 대중교통 수단</p>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">운수업체지원</span>
+                <span class="font-bold text-slate-900 sector-val" data-val="1030131">1,030,131천원</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">택시기사 지원비</span>
+                <span class="font-bold text-slate-900 sector-val" data-val="879944">879,944천원</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">기타</span>
+                <span class="font-bold text-slate-900 sector-val" data-val="77629">77,629천원</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-2 text-[11px] text-purple-700 bg-purple-50 p-2 rounded-lg font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-id-card"></i>
+            종사자 처우개선 및 안전망
+          </div>
+        </div>
+
+        <!-- 5. 기타 (0.1%) -->
+        <div class="bg-white rounded-2xl border-2 border-slate-300 shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-file-lines"></i>
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-600 text-white shadow-xs">
+                0.1%
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 mt-3">기 타</h4>
+            <div class="text-lg font-black text-slate-700 mt-1 sector-val" data-val="65184">
+              65,184천원
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">행정 운영 및 기본경비</p>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div class="bg-slate-50 p-2.5 rounded-lg">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-slate-600 font-medium">기타 행정예산</span>
+                  <span class="font-bold text-slate-900 sector-val" data-val="65184">65,184천원</span>
+                </div>
+                <p class="text-[11px] text-slate-400">교통정책 연구 및 기본 행정 관리비</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-2 text-[11px] text-slate-600 bg-slate-100 p-2 rounded-lg font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-gear"></i>
+            행정 시스템 지원
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 3: 사업 목적별 & 재원별(국·도·시비) 입체 분석 -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: 목적별 구분 (약 921.1억 원) -->
+      <div class="lg:col-span-7 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Analysis 01</span>
+              <h3 class="text-lg font-bold text-slate-900">사업 목적별 예산 구조</h3>
+            </div>
+            <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600 font-medium">총 921.1억 원</span>
+          </div>
+
+          <!-- Horizontal 3D-Like Bar Visualization (원본 Page 2 상단 바 재현) -->
+          <div class="mb-5">
+            <div class="text-xs font-semibold text-slate-500 mb-2 flex justify-between">
+              <span>목적별 예산 분포 비율</span>
+              <span class="text-blue-600 font-bold">운영지원 중심(70.2%) + 시민체감(28.7%)</span>
+            </div>
+            <div class="h-10 w-full rounded-xl overflow-hidden flex shadow-inner border border-slate-200">
+              <div class="bg-amber-600 hover:opacity-95 transition flex items-center justify-center text-white text-xs font-bold" style="width: 37.2%" title="적자결손 보전금: 343억 (37.2%)">
+                <span class="truncate px-1">적자결손 37.2%</span>
+              </div>
+              <div class="bg-blue-600 hover:opacity-95 transition flex items-center justify-center text-white text-xs font-bold" style="width: 32.9%" title="운수업체 지원금: 303억 (32.9%)">
+                <span class="truncate px-1">운수지원 32.9%</span>
+              </div>
+              <div class="bg-slate-600 hover:opacity-95 transition flex items-center justify-center text-white text-xs font-bold" style="width: 26.2%" title="교통비 지원금: 241억 (26.2%)">
+                <span class="truncate px-1">교통비 26.2%</span>
+              </div>
+              <div class="bg-amber-400 hover:opacity-95 transition flex items-center justify-center text-slate-900 text-[11px] font-bold" style="width: 2.5%" title="주민편의시설: 23억 (2.5%)">
+                <span>2.5%</span>
+              </div>
+              <div class="bg-indigo-900 hover:opacity-95 transition flex items-center justify-center text-white text-[10px] font-bold" style="width: 1.2%" title="기타: 10억 (1.1%)">
+                <span>1%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Purpose Breakdown Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs mb-4">
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+              <div class="flex items-center gap-1.5 text-amber-900 font-bold">
+                <i class="fa-solid fa-coins text-amber-600"></i> 적자결손 보전금
+              </div>
+              <div class="text-base font-extrabold text-amber-900 mt-1">343억 원</div>
+              <div class="text-[11px] text-amber-700 mt-0.5">37.2% (노선 결손 지원)</div>
+            </div>
+
+            <div class="p-3 bg-blue-50 rounded-xl border border-blue-200">
+              <div class="flex items-center gap-1.5 text-blue-900 font-bold">
+                <i class="fa-solid fa-bus text-blue-600"></i> 운수업체 지원금
+              </div>
+              <div class="text-base font-extrabold text-blue-900 mt-1">303억 원</div>
+              <div class="text-[11px] text-blue-700 mt-0.5">32.9% (버스·택시 운영)</div>
+            </div>
+
+            <div class="p-3 bg-slate-100 rounded-xl border border-slate-200">
+              <div class="flex items-center gap-1.5 text-slate-800 font-bold">
+                <i class="fa-solid fa-credit-card text-slate-600"></i> 교통비 지원금
+              </div>
+              <div class="text-base font-extrabold text-slate-900 mt-1">241억 원</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">26.2% (시민 직접체감)</div>
+            </div>
+
+            <div class="p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+              <div class="flex items-center gap-1.5 text-yellow-900 font-bold">
+                <i class="fa-solid fa-house-chimney text-yellow-600"></i> 주민편의시설
+              </div>
+              <div class="text-base font-extrabold text-yellow-900 mt-1">23억 원</div>
+              <div class="text-[11px] text-yellow-700 mt-0.5">2.5% (정류장 환경개선)</div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 col-span-2 sm:col-span-2">
+              <div class="text-slate-700 font-bold flex items-center gap-1.5 mb-1">
+                <i class="fa-solid fa-list-check text-slate-500"></i> 기타 상세 경비 (총 10억 원 / 1.1%)
+              </div>
+              <div class="grid grid-cols-3 gap-1 text-[11px] text-slate-600">
+                <div>택시기사: <strong>8.8억 (1.0%)</strong></div>
+                <div>버스기사: <strong>0.86억 (0.1%)</strong></div>
+                <div>행정운영: <strong>0.66억 (0.1%)</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Purpose Detailed Notes -->
+        <div class="p-3.5 bg-blue-50/70 border border-blue-200/60 rounded-xl text-xs text-blue-900">
+          <strong class="font-bold"><i class="fa-solid fa-check-circle mr-1 text-blue-600"></i>핵심 분석:</strong>
+          운수업체 지원 및 적자보전금이 총 <strong>646.5억 원(70.2%)</strong>으로 대중교통 운행 중단을 방지하고 필수 이동권을 보장하는
+          <span class="underline decoration-blue-400 font-semibold">공급기반 유지 중심의 안정적 예산구조</span>를 구축하고 있습니다.
+        </div>
+      </div>
+
+      <!-- Right Column: 재원별 구분 (국·도·시비 도넛 차트) -->
+      <div class="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Analysis 02</span>
+              <h3 class="text-lg font-bold text-slate-900">재원별 예산 구조 (국·도·시비)</h3>
+            </div>
+            <span class="text-xs bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full font-bold">시비 79.6%</span>
+          </div>
+          <p class="text-xs text-slate-500 mb-4">대중교통과 총예산 92,112,907천원 기준 분담비율</p>
+
+          <!-- Chart Container -->
+          <div class="relative h-56 flex items-center justify-center">
+            <canvas id="fundChart"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span class="text-xs text-slate-400 font-medium">총 예산</span>
+              <span class="text-sm font-black text-slate-800">921.1억</span>
+            </div>
+          </div>
+
+          <!-- Fund source detail rows -->
+          <div class="mt-4 space-y-2 text-xs">
+            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-slate-500"></span>
+                <span class="font-bold text-slate-700">시비 (남양주시 자체재원)</span>
+              </div>
+              <div class="text-right">
+                <span class="font-black text-slate-900 text-sm">79.60%</span>
+                <span class="text-slate-400 ml-1">(73,326,860천원)</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-2 rounded-lg bg-blue-50/60">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+                <span class="font-bold text-blue-900">국비 (정부 보조)</span>
+              </div>
+              <div class="text-right">
+                <span class="font-black text-blue-900 text-sm">13.35%</span>
+                <span class="text-blue-500 ml-1">(12,293,043천원)</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-2 rounded-lg bg-amber-50/60">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <span class="font-bold text-amber-900">도비 (경기도 보조)</span>
+              </div>
+              <div class="text-right">
+                <span class="font-black text-amber-900 text-sm">7.05%</span>
+                <span class="text-amber-600 ml-1">(6,493,004천원)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fund Insight Note -->
+        <div class="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900">
+          <strong class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1 text-rose-600"></i>재원 개선 과제:</strong>
+          시비 부담(79.6%)이 압도적으로 높아, 향후 광역교통 및 알뜰교통 연계 등 
+          <strong>국·도비 연계사업 발굴 및 매칭비율 확대</strong>가 필수적입니다.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Section 4: 시민 맞춤형 수혜액 시뮬레이터 (Interactive Feature) -->
+    <section id="calculator" class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-6">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-sky-400/20 text-sky-300 border border-sky-400/30 inline-block mb-2">
+            체감형 인터랙티브 분석
+          </span>
+          <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            나의 남양주 대중교통 혜택 알아보기
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl mx-auto">
+            시민 여러분의 이동 특성에 따라 시 예산이 어떻게 지원되고 있는지 확인해 보세요.
+          </p>
+        </div>
+
+        <!-- Persona Selection Pills -->
+        <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
+          <button onclick="selectPersona('regular')" id="btn-p-regular" class="persona-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-sky-500 text-white shadow-md">
+            <i class="fa-solid fa-briefcase"></i> 일반 직장인/통근자
+          </button>
+          <button onclick="selectPersona('youth')" id="btn-p-youth" class="persona-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
+            <i class="fa-solid fa-graduation-cap"></i> 청년 / 학생
+          </button>
+          <button onclick="selectPersona('senior')" id="btn-p-senior" class="persona-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
+            <i class="fa-solid fa-person-cane"></i> 어르신 (만 65세 이상)
+          </button>
+          <button onclick="selectPersona('driver')" id="btn-p-driver" class="persona-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
+            <i class="fa-solid fa-taxi"></i> 택시 운수종사자
+          </button>
+        </div>
+
+        <!-- Result Box -->
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <div class="md:col-span-2 space-y-3">
+            <div class="flex items-center gap-2">
+              <span id="persona-badge" class="px-2 py-0.5 rounded text-xs font-bold bg-sky-400 text-slate-900">일반 통근자</span>
+              <h4 id="persona-title" class="text-base sm:text-lg font-bold text-white">매일 버스로 출퇴근하는 남양주 시민</h4>
+            </div>
+            <p id="persona-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              시민 1인당 연간 약 <strong>1,041,371원</strong> 수준의 준공영제 적자보전과 운수업체 지원을 통해 안정적인 배차와 노선 유지가 보장되며, 스마트 쉼터 및 정류장 편의시설을 상시 이용하고 있습니다.
+            </p>
+            <div id="persona-benefits" class="flex flex-wrap gap-2 text-xs">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/20">
+                <i class="fa-solid fa-check mr-1"></i>적자노선 폐선 방지 혜택
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-400/20">
+                <i class="fa-solid fa-check mr-1"></i>스마트 버스정류장 온열/냉방 쉘터
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">
+                <i class="fa-solid fa-check mr-1"></i>K-패스 및 광역 교통비 환급 연계
+              </span>
+            </div>
+          </div>
+
+          <!-- Calculated Benefit Figure -->
+          <div class="bg-white/15 rounded-xl p-4 text-center border border-white/20">
+            <span class="text-xs text-slate-300">연간 체감 및 직접 수혜 추정액</span>
+            <div id="persona-amount" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">
+              약 104만 원
+            </div>
+            <div class="mt-2 text-[11px] text-slate-400">
+              (간접 운행보조금 + 편의시설 수혜 기준)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: 공식 종합 예산표 및 단위별 상세 내역 (Table) -->
+    <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-200 gap-2">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-table-list text-blue-600"></i>
+            3. 대중교통 예산 세부 사업 내역서
+          </h3>
+          <p class="text-xs text-slate-500">2026년 대중교통과 제1회 추경 기준 전체 92,112,907천원 정밀 내역</p>
+        </div>
+        <div class="text-xs text-slate-400">
+          단위: <span class="current-unit-text font-bold text-slate-700">천원</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold">
+              <th class="py-3 px-4">분야</th>
+              <th class="py-3 px-4">세부 항목</th>
+              <th class="py-3 px-4 text-right">예산액</th>
+              <th class="py-3 px-4 text-right">비중(%)</th>
+              <th class="py-3 px-4">주요 수혜 대상 및 내용</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700">
+            <!-- 버스 그룹 -->
+            <tr class="hover:bg-slate-50/80 transition">
+              <td rowspan="3" class="py-3 px-4 font-bold text-emerald-700 bg-emerald-50/30 border-r border-slate-100 align-top">
+                <i class="fa-solid fa-bus mr-1"></i> 버스<br>
+                <span class="text-xs text-emerald-600 font-normal">총 63,712,740천원 (69.2%)</span>
+              </td>
+              <td class="py-2.5 px-4 font-medium">적자결손보전금</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="34306677">34,306,677천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">37.2%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">비수익 노선 및 벽지노선 지속 운행 결손액 보전</td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-2.5 px-4 font-medium">운수업체지원금</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="29318127">29,318,127천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">31.8%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">시내·마을버스 공공관리제 및 준공영제 운영비 지원</td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-2.5 px-4 font-medium">기타 (버스기사 지원 등)</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="87936">87,936천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">0.1%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">버스기사 처우개선 및 안전운행 부대사업 (기사지원 86,636천원 포함)</td>
+            </tr>
+
+            <!-- 교통비 지원 -->
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-3 px-4 font-bold text-sky-700 bg-sky-50/30 border-r border-slate-100">
+                <i class="fa-solid fa-credit-card mr-1"></i> 교통비 지원
+              </td>
+              <td class="py-2.5 px-4 font-medium">교통비 직접 지원금</td>
+              <td class="py-2.5 px-4 text-right font-bold text-sky-700 table-val" data-val="24124000">24,124,000천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">26.2%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">남양주 시민 대중교통 이용료 환급, 청년/어르신 교통비 보조</td>
+            </tr>
+
+            <!-- 버스정류장 -->
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-3 px-4 font-bold text-indigo-700 bg-indigo-50/30 border-r border-slate-100">
+                <i class="fa-solid fa-person-shelter mr-1"></i> 버스정류장
+              </td>
+              <td class="py-2.5 px-4 font-medium">주민편의시설 개선 및 설치</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="2223279">2,223,279천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">2.4%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">스마트쉘터, 온열의자, 쿨링포그, 정류소 표지판 정비</td>
+            </tr>
+
+            <!-- 택시 그룹 -->
+            <tr class="hover:bg-slate-50/80 transition">
+              <td rowspan="3" class="py-3 px-4 font-bold text-purple-700 bg-purple-50/30 border-r border-slate-100 align-top">
+                <i class="fa-solid fa-taxi mr-1"></i> 택시<br>
+                <span class="text-xs text-purple-600 font-normal">총 1,987,704천원 (2.2%)</span>
+              </td>
+              <td class="py-2.5 px-4 font-medium">운수업체지원금</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="1030131">1,030,131천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">1.1%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">카드수수료 및 택시 콜시스템 운영 지원 등</td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-2.5 px-4 font-medium">택시기사 지원비</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="879944">879,944천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">1.0%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">택시 운수종사자(약 1,519명) 복지 및 처우 개선 지원</td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-2.5 px-4 font-medium">기타</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="77629">77,629천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">0.1%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">택시 승차대 정비 및 기타 부대사업비</td>
+            </tr>
+
+            <!-- 기타 -->
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-3 px-4 font-bold text-slate-600 bg-slate-50 border-r border-slate-100">
+                <i class="fa-solid fa-file-invoice mr-1"></i> 기타
+              </td>
+              <td class="py-2.5 px-4 font-medium">기타 행정운영 경비</td>
+              <td class="py-2.5 px-4 text-right font-bold table-val" data-val="65184">65,184천원</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">0.1%</td>
+              <td class="py-2.5 px-4 text-slate-500 text-xs">대중교통과 행정 운영 기본경비 (총 66,484천원 중 65,184천원 배정)</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-blue-50/80 font-bold text-slate-900 border-t-2 border-blue-600">
+              <td colspan="2" class="py-3 px-4 text-center text-sm font-extrabold text-blue-900">
+                합 계 (대중교통과 전체 예산)
+              </td>
+              <td class="py-3 px-4 text-right text-base text-blue-900 font-black table-val" data-val="92112907">
+                92,112,907천원
+              </td>
+              <td class="py-3 px-4 text-right text-sm text-blue-900 font-extrabold">100.0%</td>
+              <td class="py-3 px-4 text-blue-800 text-xs">
+                인구 1인당 단순 안분액 126,691원 / 실질 수혜 1,041,371원
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 6: 문서 3대 분석 결과 및 정책 제언 -->
+    <section>
+      <div class="mb-4">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-check text-blue-600"></i>
+          4. 분석 결과 및 향후 정책 방향 (종합 결론)
+        </h3>
+        <p class="text-xs text-slate-500">자료 2페이지 3. 분석 결과 요약</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- 1. 예산구조 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between hover:border-blue-400 transition">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-3">
+              <i class="fa-solid fa-gears text-lg"></i>
+            </div>
+            <span class="text-xs font-bold text-blue-600 uppercase">구조 분석</span>
+            <h4 class="text-base font-bold text-slate-900 mt-1">예산구조: 공급기반 유지 중심</h4>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              총예산 <strong>921.1억 원 중 70.2%(646.5억 원)</strong>가 운수업체 지원금과 적자결손 보전금에 집중되어 있습니다.
+            </p>
+            <div class="mt-3 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-100 leading-normal">
+              <strong>시사점:</strong> 대중교통의 안정적인 운행과 비수익 노선의 지속성을 보장하기 위한 <em>필수 운영지원 중심</em>의 건전한 인프라 예산구조입니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 시민수혜 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between hover:border-emerald-400 transition">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3">
+              <i class="fa-solid fa-hands-holding-circle text-lg"></i>
+            </div>
+            <span class="text-xs font-bold text-emerald-600 uppercase">수혜 분석</span>
+            <h4 class="text-base font-bold text-slate-900 mt-1">시민수혜: 체감형 직접 혜택 병행</h4>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              교통비 지원금 <strong>241.2억 원(26.2%)</strong> 및 주민편의시설 <strong>23억 원(2.5%)</strong> 등 전체의 <strong>28.7%</strong>가 시민 직접 체감 분야에 배분되었습니다.
+            </p>
+            <div class="mt-3 p-3 bg-emerald-50 rounded-xl text-xs text-emerald-900 border border-emerald-100 leading-normal">
+              <strong>시사점:</strong> 공급 안정화뿐만 아니라 시민들의 실질 교통비 경감과 정류소 온열/스마트 쉼터 등 <em>이용환경 개선을 동시에 실현</em>하고 있습니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 재원구조 -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between hover:border-rose-400 transition">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center mb-3">
+              <i class="fa-solid fa-scale-unbalanced text-lg"></i>
+            </div>
+            <span class="text-xs font-bold text-rose-600 uppercase">재원 분석</span>
+            <h4 class="text-base font-bold text-slate-900 mt-1">재원구조: 높은 시비 부담 해소 필요</h4>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              전체 예산 중 <strong>시비가 733.3억 원(79.6%)</strong>으로 국비(13.4%), 도비(7.1%)에 비해 시 자체 재정 의존도가 매우 높은 취약한 구조입니다.
+            </p>
+            <div class="mt-3 p-3 bg-rose-50 rounded-xl text-xs text-rose-900 border border-rose-100 leading-normal">
+              <strong>정책 제언:</strong> 지속적인 광역·대중교통 서비스 확대를 위해 <em>국·도비 매칭 공모사업 발굴 및 광역 교통 재원분담 협약 확대</em>가 시급합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Component -->
+  <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 mt-12 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-white font-bold text-sm">남양주시청 대중교통과</span>
+            <span class="text-slate-500">|</span>
+            <span>2026. 10. 6. 보고자료 웹 열람본</span>
+          </div>
+          <p class="text-slate-500 mt-1">
+            담당: 남양주시 대중교통과
+          </p>
+        </div>
+        <div class="text-right text-slate-500">
+          <p>기준: 2026년 제1회 추가경정예산 / 남양주시 인구통계(26.9 기준 727,066명)</p>
+          <p class="text-slate-600 mt-0.5">본 시스템은 공공 예산의 주민 알권리와 투명성 제고를 위해 제작되었습니다.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // State management for currency unit
+    let currentUnit = 'thous'; // 'krw', 'thous', 'eok'
+
+    // Format numbers helper
+    function formatNumber(num) {
+      return num.toLocaleString('ko-KR');
+    }
+
+    // Currency conversion function
+    // Base data in data-val attribute is always in '천원' (thousands of KRW)
+    function convertValue(thousValue, targetUnit) {
+      const num = Number(thousValue);
+      if (isNaN(num)) return '';
+
+      if (targetUnit === 'krw') {
+        const fullWon = num * 1000;
+        return formatNumber(fullWon) + '원';
+      } else if (targetUnit === 'eok') {
+        const eok = (num / 100000).toFixed(1);
+        return eok + '억 원';
+      } else {
+        // default 'thous'
+        return formatNumber(num) + '천원';
+      }
+    }
+
+    // Update all dynamic numbers in the DOM
+    function updateAllCurrencyDisplays() {
+      // Update sector values
+      document.querySelectorAll('.sector-val').forEach(el => {
+        const val = el.getAttribute('data-val');
+        if (val) el.textContent = convertValue(val, currentUnit);
+      });
+
+      // Update table values
+      document.querySelectorAll('.table-val').forEach(el => {
+        const val = el.getAttribute('data-val');
+        if (val) el.textContent = convertValue(val, currentUnit);
+      });
+
+      // Update Top KPIs
+      const kpiTotal = document.getElementById('kpi-total-budget');
+      if (kpiTotal) kpiTotal.textContent = convertValue('92112907', currentUnit);
+
+      const kpiCity = document.getElementById('kpi-city-amount');
+      if (kpiCity) kpiCity.textContent = '시비 부담액: ' + convertValue('73326860', currentUnit);
+
+      // Update unit label
+      const unitTexts = {
+        'krw': '원 (￦)',
+        'thous': '천원',
+        'eok': '억원'
+      };
+      document.querySelectorAll('.current-unit-text').forEach(el => {
+        el.textContent = unitTexts[currentUnit];
+      });
+
+      // Toggle button styles
+      ['krw', 'thous', 'eok'].forEach(u => {
+        const btn = document.getElementById('btn-unit-' + u);
+        if (btn) {
+          if (u === currentUnit) {
+            btn.className = 'px-2.5 py-1 rounded-lg font-bold bg-white text-blue-700 shadow-xs border border-slate-200';
+          } else {
+            btn.className = 'px-2.5 py-1 rounded-lg font-medium transition text-slate-600 hover:text-slate-900';
+          }
+        }
+      });
+    }
+
+    function setCurrencyUnit(unit) {
+      currentUnit = unit;
+      updateAllCurrencyDisplays();
+    }
+
+    // Persona Interactive Calculator Data
+    const personaData = {
+      regular: {
+        badge: '일반 통근자',
+        title: '매일 버스로 출퇴근하는 남양주 시민',
+        desc: '시민 1인당 연간 약 1,041,371원 수준의 준공영제 적자보전과 운수업체 지원을 통해 안정적인 배차와 노선 유지가 보장되며, 스마트 쉼터 및 정류장 편의시설을 상시 이용하고 있습니다.',
+        amount: '약 104만 원',
+        sub: '(간접 운행보조금 + 편의시설 수혜 기준)',
+        benefits: [
+          '<i class="fa-solid fa-check mr-1"></i>적자노선 폐선 방지 혜택',
+          '<i class="fa-solid fa-check mr-1"></i>스마트 버스정류장 온열/냉방 쉘터',
+          '<i class="fa-solid fa-check mr-1"></i>K-패스 및 광역 교통비 환급 연계'
+        ]
+      },
+      youth: {
+        badge: '청년 / 청소년',
+        title: '통학 및 대외활동이 활발한 청년 계층',
+        desc: '연간 241.2억 원 규모의 대중교통비 지원금 사업을 통해 교통카드 충전금 환급 또는 청년 기본 교통비 지원을 직접 수령하여 가계 교통비 지출 부담을 대폭 절감하고 있습니다.',
+        amount: '약 120만 원',
+        sub: '(직접 환급금 약 16만 원 + 간접지원 104만 원)',
+        benefits: [
+          '<i class="fa-solid fa-check mr-1"></i>청년 대중교통비 직접 환급/바우처',
+          '<i class="fa-solid fa-check mr-1"></i>정류장 실시간 도착안내(BIT) 이용',
+          '<i class="fa-solid fa-check mr-1"></i>심야·주말 안정적 버스 배차 유지'
+        ]
+      },
+      senior: {
+        badge: '어르신 (만 65세 이상)',
+        title: '병원 진료 및 여가활동을 누리는 관내 어르신',
+        desc: '벽지·수익성이 낮은 외곽마을 노선까지 결손보전금(343억 원)을 통해 유지되어 병원과 복지관을 편리하게 이동할 수 있으며, 온열의자와 스마트 쉼터 혜택을 크게 체감합니다.',
+        amount: '약 115만 원',
+        sub: '(취약노선 운영지원 + 정류소 온열쉼터 특화)',
+        benefits: [
+          '<i class="fa-solid fa-check mr-1"></i>마을/벽지노선 감차 없는 이동권 보장',
+          '<i class="fa-solid fa-check mr-1"></i>겨울철 온열의자 및 미세먼지 안심 쉘터',
+          '<i class="fa-solid fa-check mr-1"></i>저상버스 도입 및 승하차 편의 지원'
+        ]
+      },
+      driver: {
+        badge: '택시 운수종사자 (약 1,519명)',
+        title: '남양주시민의 심야 및 보완 교통을 책임지는 기사님',
+        desc: '총 19.8억 원의 택시 지원 예산 중 8.8억 원의 기사 전용 직접 지원비와 10.3억 원의 콜/카드수수료 보조를 통해 연간 실질적인 소득 안정 및 복지 혜택을 지원받습니다.',
+        amount: '약 130만 원',
+        sub: '(택시기사 1인당 배분 직접+간접 지원액)',
+        benefits: [
+          '<i class="fa-solid fa-check mr-1"></i>택시기사 직접 지원비 (1인당 연 약 58만 원)',
+          '<i class="fa-solid fa-check mr-1"></i>카드결제 수수료 및 콜 통신비 시비 보조',
+          '<i class="fa-solid fa-check mr-1"></i>택시 쉼터 및 승차대 환경 개선'
+        ]
+      }
+    };
+
+    function selectPersona(type) {
+      const data = personaData[type];
+      if (!data) return;
+
+      document.getElementById('persona-badge').textContent = data.badge;
+      document.getElementById('persona-title').textContent = data.title;
+      document.getElementById('persona-desc').innerHTML = data.desc;
+      document.getElementById('persona-amount').textContent = data.amount;
+
+      const subEl = document.querySelector('#persona-amount + div');
+      if (subEl) subEl.textContent = data.sub;
+
+      const benefitsContainer = document.getElementById('persona-benefits');
+      if (benefitsContainer) {
+        benefitsContainer.innerHTML = data.benefits.map(b => 
+          `<span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-200 border border-sky-400/20">${b}</span>`
+        ).join('');
+      }
+
+      // Update button active styling
+      document.querySelectorAll('.persona-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-500', 'text-white', 'shadow-md');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      const activeBtn = document.getElementById('btn-p-' + type);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+        activeBtn.classList.add('bg-sky-500', 'text-white', 'shadow-md');
+      }
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Chart.js initialization for Fund Breakdown (시비, 국비, 도비)
+    window.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('fundChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['시비 (79.60%)', '국비 (13.35%)', '도비 (7.05%)'],
+          datasets: [{
+            data: [73326860, 12293043, 6493004],
+            backgroundColor: [
+              '#64748b', // 시비 (회색/슬레이트)
+              '#2563eb', // 국비 (블루)
+              '#f59e0b'  // 도비 (오렌지/앰버)
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw;
+                  const ratio = ((val / 92112907) * 100).toFixed(2);
+                  return ` ${context.label.split(' ')[0]}: ${formatNumber(val)}천원 (${ratio}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Initial formatting pass
+      updateAllCurrencyDisplays();
+    });
+  </script>
+</body>
+</html>
